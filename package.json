@@ -1,7 +1,7 @@
 {
   "name": "turbo",
   "version": "0.0.0",
-  "description": "React framework to turbocharge your frontend development. It's written in Clojure(Script).",
+  "description": "Clojure(Script) framework to turbocharge your frontend development.",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -18,12 +18,24 @@
     "vade",
     "vadelabs",
     "clojure",
-    "clojurescript"
+    "clojurescript",
+    "react",
+    "frontend"
   ],
   "author": "Pragyan Tripathi <pragyan@vadelabs.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/vadelabs/turbo/issues"
   },
-  "homepage": "https://github.com/vadelabs/turbo#readme"
+  "homepage": "https://github.com/vadelabs/turbo#readme",
+  "dependencies": {
+    "@emotion/core": "^10.0.35",
+    "@emotion/styled": "^10.0.27",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-refresh": "^0.8.3"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.11.5"
+  }
 }
