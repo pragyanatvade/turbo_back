@@ -1,17 +1,20 @@
-{:deps         {:aliases [:dev]}
- :nrepl        {:port 9000}
- :jvm-opts     ["-Xmx2G"]
- :dependencies [[binaryage/devtools "1.0.2"]
-                [cljs-bean "1.6.0"]]
-
- :builds {:main {:target           :browser
-                 :output-dir       "resources/public/js"
-                 :asset-path       "/js"
-                 :modules          {:shared {}
-                                    :main   {:entries    [workshop]
-                                             :depends-on #{:shared}}}
-                 :compiler-options {}
-                 :dev              {:compiler-options {:output-feature-set :es6}}
-                 :devtools         {:http-root "resources/public/"
-                                    :http-port 8000
-                                    :preloads  [devtools.preload]}}}}
+{:deps     {:aliases [:develop]}
+ :nrepl    {:port 9000}
+ :http     {:port 9631}
+ :dev-http {8000 "classpath:public"}
+ :jvm-opts ["-Xmx2G"]
+ :builds   {:develop {:target           :browser
+                      :output-dir       "resources/public/js"
+                      :asset-path       "/js"
+                      :modules          {:shared {}
+                                         :main   {:init-fn    workspace/init
+                                                  :entries    [workspace]
+                                                  :depends-on #{:shared}}}
+                      :compiler-options {:output-feature-set :es8}
+                      :devtools         {:after-load workspace/refresh
+                                         :preloads   []}}
+            :cards   {:target     nubank.workspaces.shadow-cljs.target
+                      :ns-regexp  "-(test|cards)$"
+                      :output-dir "resources/public/js/workspaces"
+                      :asset-path "/js/workspaces"
+                      :preloads   []}}}
