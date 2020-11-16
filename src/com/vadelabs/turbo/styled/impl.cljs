@@ -1,7 +1,7 @@
-(ns com.vadelabs.turbo.css.impl
+(ns com.vadelabs.turbo.styled.impl
   (:require
    [clojure.string :as str]
-   [com.vadelabs.turbo.css.runtime :as runtime]
+   [com.vadelabs.turbo.styled.runtime :as runtime]
    [garden.stylesheet :refer [at-media at-supports]]))
 
 (def dev? ^boolean js/goog.DEBUG)

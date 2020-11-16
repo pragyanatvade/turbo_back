@@ -2,15 +2,15 @@
   (:require
    [com.vadelabs.turbo.dom :as dom :refer [defui]]
    [goog.dom :as gdom]
-   [com.vadelabs.turbo.ui.block :as block]))
+   [com.vadelabs.turbo.ui :as ui]))
+
+;; (defui Root
+;;   []
+;;   [:& ui/Box {} "JELLO BOC"])
 
 (defui Root
   []
-  [:& block/Block {:bg    "tomato"
-                   :w     "100%"
-                   :p     4
-                   :color "white"}
-   "This is Block"])
+  [:div {:style {:background-color "red"}} "DOM LIBR"])
 
 (defn ^:export init
   []

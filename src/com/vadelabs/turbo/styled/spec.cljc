@@ -1,4 +1,4 @@
-(ns com.vadelabs.turbo.css.spec
+(ns com.vadelabs.turbo.styled.spec
   (:require [clojure.spec.alpha :as s]))
 
 (s/def ::auto-prefix (s/coll-of (s/or :keyword keyword? :string string?) :kind set?))
@@ -12,7 +12,7 @@
 (s/def ::frames (s/+ ::frame))
 ;; (s/def ::styles (s/+ (s/or :s ::style :m ::at-rule)))
 
-(s/fdef com.vadelabs.turbo.css/defkeyframes
+(s/fdef com.vadelabs.turbo.styled/defkeyframes
   :args (s/cat :name symbol? :frames ::frames)
   :ret any?)
 
@@ -20,6 +20,6 @@
 ;;   :args (s/cat :name symbol? :styles ::styles)
 ;;   :ret any?)
 
-(s/fdef com.vadelabs.turbo.css/<keyframes
+(s/fdef com.vadelabs.turbo.styled/<keyframes
   :args (s/cat :keyframes symbol?)
   :ret any?)
