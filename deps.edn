@@ -2,6 +2,6 @@
  :deps    {garden              {:mvn/version "1.3.10"}
            hicada              {:mvn/version "0.1.8"}
            com.taoensso/encore {:mvn/version "3.9.2"}}
- :aliases {:develop {:extra-paths ["develop"]
+ :aliases {:develop {:extra-paths ["develop" "test"]
                      :extra-deps  {thheller/shadow-cljs {:mvn/version "2.11.4"}
                                    nubank/workspaces    {:mvn/version "1.0.15"}}}}}

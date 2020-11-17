@@ -1,2 +1,3 @@
-{:lint-as {com.vadelabs.turbo.dom/defui clojure.core/defn}
+{:lint-as {com.vadelabs.turbo.dom/defui   clojure.core/defn
+           nubank.workspaces.core/deftest cljs.test/deftest}
  :linters {}}

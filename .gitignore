@@ -18,4 +18,4 @@ node_modules
 .shadow-cljs
 .calva
 js/
-.cache
+.cache/
