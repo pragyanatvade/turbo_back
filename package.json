@@ -29,7 +29,9 @@
   },
   "homepage": "https://github.com/vadelabs/turbo#readme",
   "dependencies": {
-    "highlight.js": "9.18.3",
+    "create-react-class": "15.6.3",
+    "highlight.js": "^9.18.3",
+    "marked": "^1.2.5",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-grid-layout": "0.16.6",

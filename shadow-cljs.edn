@@ -3,20 +3,27 @@
  :http     {:port 9631}
  :dev-http {8000 "classpath:public"}
  :jvm-opts ["-Xmx2G"]
- :builds   {:develop    {:target           :browser
-                         :output-dir       "resources/public/js"
-                         :asset-path       "/js"
-                         :modules          {:shared {}
-                                            :main   {:init-fn    workspace/init
-                                                     :entries    [workspace]
-                                                     :depends-on #{:shared}}}
-                         :compiler-options {:output-feature-set :es8}
-                         :devtools         {:after-load workspace/refresh
-                                            :preloads   []}}
-            :workspaces {:target     :browser
-                         :output-dir "resources/public/js/workspaces"
-                         :asset-path "/js/workspaces"
-                         :modules    {:main {:entries [com.vadelabs.turbo-test]}}
-                         :devtools   {:after-load         nubank.workspaces.core/after-load
-                                      :loader-mode        :eval
-                                      :http-resource-root "."}}}}
+ :builds   {:develop {:target           :browser
+                      :output-dir       "resources/public/js"
+                      :asset-path       "/js"
+                      :modules          {:shared {}
+                                         :main   {:init-fn    workspace/init
+                                                  :entries    [workspace]
+                                                  :depends-on #{:shared}}}
+                      :compiler-options {:output-feature-set :es8}
+                      :devtools         {:after-load workspace/refresh
+                                         :preloads   []}}
+            :cards   {:target           :browser
+                      :output-dir       "resources/public/js/cards"
+                      :asset-path       "/js"
+                      :modules          {:main {:init-fn com.vadelabs.turbo-card/init}}
+                      :compiler-options {:devcards true}
+                      :build-options    {:ns-aliases {devcards-marked             cljsjs.marked
+                                                      devcards-syntax-highlighter cljsjs.highlight}}}
+            :tests   {:target           :browser
+                      :output-dir       "resources/public/js/tests"
+                      :asset-path       "/js"
+                      :modules          {:main {:init-fn com.vadelabs.turbo-test/init}}
+                      :compiler-options {:devcards true}
+                      :build-options    {:ns-aliases {devcards-marked             cljsjs.marked
+                                                      devcards-syntax-highlighter cljsjs.highlight}}}}}

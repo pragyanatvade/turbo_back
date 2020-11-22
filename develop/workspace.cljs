@@ -138,7 +138,7 @@
   (js/console.log "Loaded"))
 
 (defn ^:export refresh
-[]
-(dom/detach (gdom/getElement "app"))
-(dom/attach (dom/element Root) (gdom/getElement "app"))
-(js/console.log "Hot reloaded"))
+  []
+  (dom/detach (gdom/getElement "app"))
+  (dom/attach (dom/element Root) (gdom/getElement "app"))
+  (js/console.log "Hot reloaded"))

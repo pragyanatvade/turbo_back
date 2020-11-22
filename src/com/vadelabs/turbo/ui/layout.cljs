@@ -298,7 +298,7 @@
   [props]
   (let [{:keys [children]} props
         rest               (dissoc props :children)]
-    []))
+    [:& Box rest children]))
 
 
 (defui SimpleGrid
