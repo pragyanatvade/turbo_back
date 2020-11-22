@@ -1,10 +1,12 @@
 (ns com.vadelabs.turbo.styled
-  (:require-macros [com.vadelabs.turbo.styled])
+  (:require-macros [com.vadelabs.turbo.styled :refer [<class]])
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
    [com.vadelabs.turbo.styled.impl :as impl]
-   [com.vadelabs.turbo.styled.runtime :as runtime]))
+   [com.vadelabs.turbo.styled.runtime :as runtime]
+   [com.vadelabs.turbo.styled.parser :as p]
+   [com.vadelabs.turbo.themes :as themes]))
 
 (defn init!
   "Initialize herb, takes a map of options:
@@ -29,3 +31,10 @@
          (filter identity)
          (str/join " "))
     (throw (ex-info "join takes one or more strings as arguments" (s/explain-data :com.vadelabs.turbo.styled.spec/classes classes)))))
+
+(defn stylify
+  [props]
+  (let [theme (get props :theme (themes/build props))
+        style (p/parse (assoc props :theme theme)
+                       p/style-keys p/pseudo-keys)]
+    (<class style)))

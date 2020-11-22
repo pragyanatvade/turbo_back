@@ -4,13 +4,12 @@
 
 (defn create-breakpoints
   [config]
-  (let [config  (assoc config "base" "0em")
-        entries (sort (fn [a b]
+  (let [entries (sort (fn [a b]
                         (let [a (js/parseInt (get a 1))
                               b (js/parseInt (get b 1))]
                           (if (> a b) 1 -1)))
                       (seq config))]
-    entries))
+    (into [] (map second entries))))
 
 (defn valid-hex?
   [hex]

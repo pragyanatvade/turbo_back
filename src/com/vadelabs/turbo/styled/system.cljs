@@ -1,5 +1,6 @@
 (ns com.vadelabs.turbo.styled.system
-  (:require [taoensso.encore :as enc]))
+  (:require [taoensso.encore :as enc]
+            [clojure.string :as str]))
 
 
 (def ^:private DEFAULTS
@@ -7,139 +8,160 @@
 
 (defn- get-value
   [n scale]
-  (let [k (if (vector? n) n [n])
-        k (into [] (map (fn [item]
-                          (if (string? item)
-                            (keyword item)
-                            item)) k))]
-    (get-in scale k n)))
+  (let [k     (if (vector? n)
+                n
+                (if (string? n)
+                  (str/split n ".")
+                  [n]))
+        k     (into [] (map (fn [item]
+                              (if (string? item)
+                                (keyword item)
+                                item)) k))
+        value (get-in scale k)]
+    (if (or (map? value) (nil? value))
+      n
+      value)))
 
-(defn- media-query
+(defn- create-media-queries
   [breakpoints]
   (into [] (map (fn [breakpoint]
-                  {:screen    true
-                   :min-width breakpoint})
+                  (let [val (if (string? breakpoint)
+                              breakpoint
+                              (second breakpoint))]
+                    {:screen    true
+                     :min-width val}))
                 breakpoints)))
-
-(defn parse-responsive-style
-  [media sx scale raw props]
-  (loop [acc {}
-         idx 0
-         vec raw]
-    (if (empty? vec)
-      acc
-      (let [med  (get media idx)
-            styl (sx (first vec) scale props)]
-        (if med
-          (recur (assoc acc med styl) (inc idx) (rest vec))
-          (recur (merge acc styl) (inc idx) (rest vec)))))))
-
-(defn create-parser
-  [config]
-  (let [parser (fn [props]
-                 (let [theme (get props :theme {})
-                       style (reduce-kv
-                               (fn [acc key raw]
-                                 (let [sx                     (key config)
-                                       {default-scale :default-scale
-                                        scale         :scale} (meta sx)
-                                       scale                  (if (vector? scale) scale [scale])
-                                       val                    (if (vector? raw) (first raw) raw)]
-                                   (if sx
-                                     (let [scale (get-in theme scale default-scale)
-                                           style (sx val scale props)]
-                                       (enc/nested-merge acc style))
-                                     acc))) {} props)
-                       media (reduce-kv
-                               (fn [acc key raw]
-                                 (let [sx                     (key config)
-                                       {default-scale :default-scale
-                                        scale         :scale} (meta sx)
-                                       scale                  (if (vector? scale) scale [scale])
-                                       {breakpoints :breakpoints
-                                        :or         {breakpoints
-                                                     (:breakpoints DEFAULTS)}}
-                                       theme
-                                       val                    (if (vector? raw) (rest raw) [])]
-                                   (if sx
-                                     (let [scale (get-in theme scale default-scale)
-                                           media (cond
-                                                   (vector? raw) (parse-responsive-style
-                                                                   (media-query breakpoints)
-                                                                   sx scale val props)
-                                                   :else         {})]
-                                       (enc/nested-merge acc media))
-                                     acc))) {} props)]
-                   (with-meta style {:media media})))]
-    parser))
-
-(defn style-function
-  [options]
-  (let [{properties    :properties
-         property      :property
-         scale         :scale
-         transform     :transform
-         default-scale :default-scale
-         :or           {transform get-value}}
-        options
-        properties (or properties [property])
-        sx         (fn [value scale props]
-                     (let [n (transform value scale props)]
-                       (when n
-                         (reduce #(assoc %1 %2 n) {} properties))))]
-    (with-meta sx {:scale         scale
-                   :default-scale default-scale})))
-
-
-(defn system
-  [options]
-  (let [config (reduce-kv
-                 (fn [acc key val]
-                   (cond
-                     (= val true) (assoc acc key (style-function {:property key
-                                                                  :scale    key}))
-                     (fn? val)    (assoc acc key val)
-                     :else        (assoc acc key (style-function val))))
-                 {}
-                 options)]
-    (create-parser config)))
-
 
 (comment
 
-  (def theme {:colors    {:primary   "rebeccapurple"
-                          :secondary "papaywhip"}
-              :font-size [0 4 8 16]
-              })
+  (def b ["30em" "52em" "64em"])
+  (create-media-queries b)
+  (def c {:sm "30em"
+          :md "52em"
+          :lg "64em"})
 
-  (def parser (system {:color     {:property :color
-                                   :scale    :colors}
-                       :font-size true
-                       }))
-
-  (def styles (parser {:theme     theme
-                       :color     ["primary" nil "secondary"]
-                       :font-size [1 2 3]
-                       }))
-
-  styles
-  (meta styles)
-
-  (def config {:color            true
-               :background-color {:property :background-color
-                                  :scale    :colors}
-               :mx               {:scale      :space
-                                  :properties [:margin-left :margin-right]}})
-  (def parser-2 (system config))
-
-  (def theme-2 {:space  [0 4 8 16 32]
-                :colors {:primary "rebeccapurple"}})
-  (def styles-2 (parser-2 {:theme            theme-2
-                           :color            "tomato"
-                           :background-color "primary"
-                           :mx               [2 3 4]}))
-
-  styles-2
-  (meta styles-2)
+  (create-media-queries c)
 
   )
+
+
+(defn- filter-props
+  [props coll]
+  (into {} (filter
+             (fn [[key val]]
+               (and val (contains? coll key)))
+             props)))
+
+(defn- create-responsive-style
+  [queries style-fn scale value props style-keys]
+  (loop [acc {}
+         idx 0
+         val value]
+    (if (empty? val)
+      acc
+      (let [query (get queries idx)
+            style (style-fn (first val) scale props)
+            style (filter-props style style-keys)]
+        (if query
+          (recur (assoc acc query style) (inc idx) (rest val))
+          (recur acc (inc idx) (rest val)))))))
+
+(defn- parser
+  ([config props style-keys pseudo-keys]
+   (parser config props style-keys pseudo-keys (:theme props)))
+  ([config props style-keys pseudo-keys theme]
+   (let [props        (enc/merge (:turbo$css props)
+                                 props)
+         style-props  (filter-props props style-keys)
+         pseudo-props (filter-props props pseudo-keys)
+         style        (reduce-kv
+                        (fn [acc key val]
+                          (let [style-fn                      (key config)
+                                {:keys [scale default-scale]} (meta style-fn)
+                                scale                         (if (vector? scale) scale [scale])
+                                scale                         (get-in theme scale default-scale)
+                                val                           (if (vector? val) (first val) val)
+                                style                         (when style-fn
+                                                                (style-fn val scale style-props))]
+                            (if style
+                              (enc/nested-merge acc style)
+                              acc)))
+                        {} style-props)
+         media        (reduce-kv
+                        (fn [acc key val]
+                          (let [style-fn                          (key config)
+                                {:keys [scale default-scale]}     (meta style-fn)
+                                scale                             (if (vector? scale) scale [scale])
+                                scale                             (get-in theme scale default-scale)
+                                val                               (when (vector? val) (rest val))
+                                {:keys [breakpoints]
+                                 :or   {breakpoints
+                                        (:breakpoints DEFAULTS)}} theme
+                                media-queries                     (create-media-queries breakpoints)
+                                style                             (create-responsive-style
+                                                                    media-queries
+                                                                    style-fn scale val style-props style-keys)]
+                            (if style
+                              (enc/nested-merge acc style)
+                              acc)))
+                        {} style-props)
+         pseudo       (reduce-kv
+                        (fn [acc key val]
+                          (assoc acc key
+                                 (parser config val style-keys pseudo-keys theme)))
+                        {}
+                        pseudo-props)]
+     {:style  style
+      :media  media
+      :pseudo pseudo})))
+
+(defn- create-parser
+  [config]
+  (fn [props style-keys pseudo-keys]
+    (let [parsed                       (parser config props style-keys pseudo-keys)
+          {:keys [style media pseudo]} parsed
+          pseudo-media                 (reduce-kv
+                                         (fn [acc key val]
+                                           (let [media (:media val)]
+                                             (when (not-empty media)
+                                               (let [m (reduce-kv
+                                                         (fn [acc query style]
+                                                           (assoc acc query {:pseudo {key style}}))
+                                                         {}
+                                                         media)]
+                                                 (enc/nested-merge acc m)))))
+                                         {}
+                                         pseudo)
+          pseudo-vals                  (reduce-kv
+                                         (fn [acc key val]
+                                           (assoc acc key (:style val)))
+                                         {}
+                                         pseudo)]
+      (with-meta style {:media (enc/nested-merge media pseudo-media) :pseudo pseudo-vals}))))
+
+(defn- create-style-function
+[{:keys [properties property scale transform default-scale]
+  :or   {transform get-value}}]
+  (let [properties (or properties [property])
+        style-fn   (fn [value scale props]
+                     (let [final-value (transform value scale props)]
+                       (if final-value
+                         (reduce #(assoc %1 %2 final-value) {} properties)
+                         (reduce #(assoc %1 %2 value) {} properties))))]
+    (with-meta style-fn {:scale         scale
+                         :default-scale default-scale})))
+
+
+(defn system
+  [config]
+  (let [config (reduce-kv
+                 (fn [acc key val]
+                   (cond
+                     (= val true) (assoc acc key (create-style-function {:property key
+                                                                         :scale    key}))
+                     (fn? val)    (assoc acc key val)
+                     :else        (assoc acc key (create-style-function val))))
+                 {}
+                 config)]
+    (create-parser config)))
+

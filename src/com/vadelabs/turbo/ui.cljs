@@ -1,8 +1,14 @@
 (ns com.vadelabs.turbo.ui
   (:refer-clojure :exclude [Box])
   (:require
-   [com.vadelabs.turbo.ui.box :as box]))
+   [com.vadelabs.turbo.ui.layout :as l]))
 
-(def Box box/Box)
-(def Square box/Square)
-(def Circle box/Circle)
+(def Box l/Box)
+(def Square l/Square)
+(def Circle l/Circle)
+(def Center l/Center)
+(def Flex l/Flex)
+(def Spacer l/Spacer)
+(def Code l/Code)
+(def Container l/Container)
+(def Divider l/Divider)

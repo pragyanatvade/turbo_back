@@ -1,17 +1,21 @@
 (ns com.vadelabs.turbo.themes
-  (:require [com.vadelabs.turbo.themes.foundation :as f]))
+  (:require
+   [com.vadelabs.turbo.themes.foundation :refer [foundation]]
+   [com.vadelabs.turbo.dom :as dom]))
 
-(def theme (merge f/typography {:breakpoints f/breakpoints
-                                :z-indices   f/z-indices
-                                :radius      f/radius
-                                :borders     f/borders
-                                :colors      f/colors
-                                :sizes       f/sizes
-                                :shadows     f/shadows
-                                :transition  f/transition}))
+
+(def theme foundation)
+
+(defn build
+  [_]
+  theme)
+
+(def theme-context (dom/create-context theme))
+(defn use-theme []
+  (dom/use-context theme-context))
 
 (comment
 
-  f/breakpoints
+  (use-theme)
 
   )
