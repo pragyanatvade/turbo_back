@@ -1,5 +1,5 @@
-(ns com.vadelabs.turbo.css
-  (:require [com.vadelabs.turbo.css.spec]
+(ns com.vadelabs.turbo.styled
+  (:require [com.vadelabs.turbo.styled.spec]
             [garden.types])
   (:import [garden.types CSSAtRule]))
 
@@ -22,7 +22,7 @@
         n#    (name (ns-name *ns*))
         obj   `(CSSAtRule. :keyframes ~value)]
     `(do
-       (com.vadelabs.turbo.css.runtime/inject-obj! (str ~n# "/" ~s#) :keyframes ~obj)
+       (com.vadelabs.turbo.styled.runtime/inject-obj! (str ~n# "/" ~s#) :keyframes ~obj)
        (def ~sym ~obj))))
 
 
@@ -43,7 +43,7 @@
         s#      `'~sym
         n#      (name (ns-name *ns*))]
     `(do
-       (com.vadelabs.turbo.css.runtime/inject-obj! (str ~n# "/" ~s# ) :global ~styles#)
+       (com.vadelabs.turbo.styled.runtime/inject-obj! (str ~n# "/" ~s# ) :global ~styles#)
        (def ~sym ~styles#))))
 
 
@@ -66,12 +66,12 @@
   [sym]
   (let [s# `'~sym
         n# (name (ns-name *ns*))]
-    `(-> @com.vadelabs.turbo.css.runtime/injected-keyframes
+    `(-> @com.vadelabs.turbo.styled.runtime/injected-keyframes
          (get (str ~n# "/" ~s#))
          :css)))
 
 (defmacro defgroup
-  "Define a style group, takes a name and a map of styles in the form:
+"Define a style group, takes a name and a map of styles in the form:
   ```clojure
   (defgroup my-group
     {:a-component {:color \"red\"}})
@@ -85,13 +85,13 @@
   arguments are handled (every function is grouped), but keeping for backward
   compatibility.
   "
-  [n c]
-  `(defn ~n [~'component & ~'args]
-     (if-let [style# (get ~c ~'component)]
-       (vary-meta
-         style# assoc
-         :hint (name ~'component))
-       (throw (str "turbo.css error: failed to get component: " ~'component " in stylegroup: " '~n)))))
+[n c]
+`(defn ~n [~'component & ~'args]
+   (if-let [style# (get ~c ~'component)]
+     (vary-meta
+       style# assoc
+       :hint (name ~'component))
+     (throw (str "turbo.css error: failed to get component: " ~'component " in stylegroup: " '~n)))))
 
 (defn- dispatch
   [style-fn kind args]
@@ -109,7 +109,7 @@
                        {:function     ~f
                         :namespace    ~n
                         :return-value (~style ~@args)}))
-       :else (com.vadelabs.turbo.css.impl/with-style! ~kind ~f ~n ~style ~@args))))
+       :else (com.vadelabs.turbo.styled.impl/with-style! ~kind ~f ~n ~style ~@args))))
 
 (defmacro <style
   "Takes a function `style-fn` that returns a map. Arguments `args` can be passed

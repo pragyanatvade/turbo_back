@@ -1,4 +1,4 @@
-(ns com.vadelabs.turbo.css.runtime
+(ns com.vadelabs.turbo.styled.runtime
   (:require [goog.dom :as dom]
             [goog.object :as gobj]
             [garden.core :refer [css]]
@@ -85,7 +85,7 @@
     (let [element (dom/createElement "style")]
       (gobj/set element "type" "text/css")
       (when attr
-        (.setAttribute element "data-herb" attr))
+        (.setAttribute element "data-turbo-styled" attr))
       (dom/appendChild head element)
       element)))
 
@@ -128,7 +128,7 @@
                 :keyframes injected-keyframes)]
     (when-not (= (:data (get @state sym)) obj)
       (let [css-str (css {:pretty-print? dev?} obj)]
-        (let [element    (or (.querySelector js/document (str "style[data-herb=\"" (name dispatch) "\"]"))
+        (let [element    (or (.querySelector js/document (str "style[data-turbo-styled=\"" (name dispatch) "\"]"))
                              (create-element! (name dispatch)))
               inner-html (gobj/get element "innerHTML")]
           (gobj/set element "innerHTML" (str inner-html (when dev? "\n") css-str)))

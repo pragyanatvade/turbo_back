@@ -37,9 +37,10 @@
   [body]
   (let [options {:create-element  'com.vadelabs.turbo.dom/create-element
                  :rewrite-for?    true
-                 :array-children? true}]
-    (-> body
-        (hicada.compiler/compile options handlers &env))))
+                 :array-children? true}
+        result  (-> body
+                    (hicada.compiler/compile options handlers &env))]
+    result))
 
 (defmethod hc/compile-form "cond"
   [[_ & clauses]]
@@ -63,7 +64,6 @@
 (defmethod hc/compile-form "fn"
   [[_ params & body]]
   `(fn ~params ~@(butlast body) ~(hc/emitter (last body))))
-
 
 (defn parse-defui
   [args]
@@ -131,6 +131,8 @@
 
 (comment
 
-  (macroexpand-1 '(defui [] [:h1 "hello world"]))
+  (macroexpand-1 '(defui Header []
+                    (let [as :h1]
+                      [as "hello world"])))
 
   )

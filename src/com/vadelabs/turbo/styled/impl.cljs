@@ -1,10 +1,12 @@
-(ns com.vadelabs.turbo.css.impl
+(ns com.vadelabs.turbo.styled.impl
   (:require
    [clojure.string :as str]
-   [com.vadelabs.turbo.css.runtime :as runtime]
+   [com.vadelabs.turbo.styled.runtime :as runtime]
    [garden.stylesheet :refer [at-media at-supports]]))
 
 (def dev? ^boolean js/goog.DEBUG)
+
+(declare extract-meta)
 
 (defn- convert-pseudo
   [pseudos]
@@ -16,7 +18,11 @@
 (defn- convert-media
   [media]
   (map (fn [[query style]]
-         (at-media query [:& style]))
+         (let [pseudo (-> style
+                          ;;(meta)
+                          :pseudo
+                          (convert-pseudo))]
+           (at-media query (into [:& style] pseudo))))
        media))
 
 (defn- convert-supports
@@ -76,16 +82,13 @@
   (loop [sf     style-fns
          result []]
     (cond
+      (fn? sf) (recur [sf] result)
 
-      (fn? sf)
-      (recur [sf] result)
-
-      (and (vector? sf) (seq sf))
-      (let [styles   (resolve-style-fns sf)
-            new-meta (into [] (process-meta-xform :extend) styles)]
-        (recur new-meta
-               (into styles result)))
-      :else result)))
+      (and (vector? sf) (seq sf)) (let [styles   (resolve-style-fns sf)
+                                        new-meta (into [] (process-meta-xform :extend) styles)]
+                                    (recur new-meta
+                                           (into styles result)))
+      :else                       result)))
 
 (defn- extract-meta
   "Takes a group of resolved styles and a meta type. Pull out each meta obj and
@@ -138,7 +141,7 @@
        "_" hsh))
 
 (defn- create-data-string
-  "Create a fully qualified name string for use in the data-herb attr"
+  "Create a fully qualified name string for use in the data-turbo attr"
   [n]
   (let [c   (str/split n #"/")
         ns  (apply str (interpose "." (butlast c)))

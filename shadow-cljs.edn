@@ -3,18 +3,20 @@
  :http     {:port 9631}
  :dev-http {8000 "classpath:public"}
  :jvm-opts ["-Xmx2G"]
- :builds   {:develop {:target           :browser
-                      :output-dir       "resources/public/js"
-                      :asset-path       "/js"
-                      :modules          {:shared {}
-                                         :main   {:init-fn    workspace/init
-                                                  :entries    [workspace]
-                                                  :depends-on #{:shared}}}
-                      :compiler-options {:output-feature-set :es8}
-                      :devtools         {:after-load workspace/refresh
-                                         :preloads   []}}
-            :cards   {:target     nubank.workspaces.shadow-cljs.target
-                      :ns-regexp  "-(test|cards)$"
-                      :output-dir "resources/public/js/workspaces"
-                      :asset-path "/js/workspaces"
-                      :preloads   []}}}
+ :builds   {:develop    {:target           :browser
+                         :output-dir       "resources/public/js"
+                         :asset-path       "/js"
+                         :modules          {:shared {}
+                                            :main   {:init-fn    workspace/init
+                                                     :entries    [workspace]
+                                                     :depends-on #{:shared}}}
+                         :compiler-options {:output-feature-set :es8}
+                         :devtools         {:after-load workspace/refresh
+                                            :preloads   []}}
+            :workspaces {:target     :browser
+                         :output-dir "resources/public/js/workspaces"
+                         :asset-path "/js/workspaces"
+                         :modules    {:main {:entries [com.vadelabs.turbo-test]}}
+                         :devtools   {:after-load         nubank.workspaces.core/after-load
+                                      :loader-mode        :eval
+                                      :http-resource-root "."}}}}
