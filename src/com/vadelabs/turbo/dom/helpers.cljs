@@ -1,4 +1,4 @@
-(ns com.vadelabs.turbo.dom.utils)
+(ns com.vadelabs.turbo.dom.helpers)
 
 (defn obj->map
   "Convert shallowly an js object to cljs map."

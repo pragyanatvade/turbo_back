@@ -1,10 +1,19 @@
 (ns com.vadelabs.turbo.ui.layout
   (:refer-clojure :exclude [Box List])
   (:require
+   [taoensso.encore :as enc]
    [com.vadelabs.turbo.dom :as dom :refer [defui]]
-   [com.vadelabs.turbo.styled :refer [stylify]]))
+   [com.vadelabs.turbo.styled :refer [stylify]]
+   [com.vadelabs.turbo.ui.helpers :as tuh]))
 
-(declare Box)
+
+(defui Box
+  "Box is the most abstract component on top of which other turbo
+   components are built. It renders a `div` element by default."
+  [props]
+  (let [{:keys [as children]
+         :or   {as :div}} props]
+    [(name as) {:class (stylify props)} children]))
 
 (defui AspectRatio
   [props]
@@ -16,20 +25,15 @@
   [props]
   (let [{:keys [children]} props
         rest               (dissoc props :children)
+        style              (tuh/use-style-config :Badge props)
         rest               (assoc rest
-                                  :turbo$css {:display        "inline-block"
-                                              :white-space    "nowrap"
-                                              :vertical-align "middle"}
+                                  :turbo$css (assoc
+                                               style
+                                               :display        "inline-block"
+                                               :white-space    "nowrap"
+                                               :vertical-align "middle")
                                   :as :span)]
     [:& Box rest children]))
-
-(defui Box
-  "Box is the most abstract component on top of which other turbo
-   components are built. It renders a `div` element by default."
-  [props]
-  (let [{:keys [as children]
-         :or   {as :div}} props]
-    [(name as) {:class (stylify props)} children]))
 
 (defui Square
   [props]
@@ -298,7 +302,7 @@
   [props]
   (let [{:keys [children]} props
         rest               (dissoc props :children)]
-    []))
+    [:& Box rest children]))
 
 
 (defui SimpleGrid

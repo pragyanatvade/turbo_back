@@ -16,3 +16,6 @@
 (defn use-turbo
   []
   )
+
+(defn use-style
+  [])

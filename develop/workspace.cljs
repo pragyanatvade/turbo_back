@@ -98,10 +98,14 @@
 ;;         Ipsum."]])
 
 
+;; (defui Root
+;;   []
+;;   [:& ui/Divider {:border-color "red"
+;;                   :orientation  :vertical}])
+
 (defui Root
   []
-  [:& ui/Divider {:border-color "red"
-                  :orientation  :vertical}])
+  [:& ui/Badge {} "Success"])
 
 ;; (defui Root
 ;;   []
@@ -138,7 +142,7 @@
   (js/console.log "Loaded"))
 
 (defn ^:export refresh
-[]
-(dom/detach (gdom/getElement "app"))
-(dom/attach (dom/element Root) (gdom/getElement "app"))
-(js/console.log "Hot reloaded"))
+  []
+  (dom/detach (gdom/getElement "app"))
+  (dom/attach (dom/element Root) (gdom/getElement "app"))
+  (js/console.log "Hot reloaded"))

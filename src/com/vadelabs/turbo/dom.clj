@@ -17,7 +17,7 @@
         (list* 'js* (str "{" kvs-str "}") (mapv identity (vals m)))
         assoc :tag 'object))))
 
-(create-ns 'com.vadelabs.turbo.dom.utils)
+(create-ns 'com.vadelabs.turbo.dom.helpers)
 
 (def handlers
   {:& (fn ([_ klass]
@@ -27,7 +27,7 @@
          (let [klass klass]
            (if (map? props)
              [klass (to-js-map props) children]
-             [klass (list 'com.vadelabs.turbo.dom.utils/map->obj props) children]))))
+             [klass (list 'com.vadelabs.turbo.dom.helpers/map->obj props) children]))))
    :* (fn [_ attrs & children]
         (if (map? attrs)
           ['com.vadelabs.turbo.dom/Fragment attrs children]
@@ -97,7 +97,7 @@
                      [argsym]
                      [])]
        (let [~@(cond
-                 (and arg (::wrap-props meta true)) [arg `(com.vadelabs.turbo.dom.utils/wrap-props ~argsym)]
+                 (and arg (::wrap-props meta true)) [arg `(com.vadelabs.turbo.dom.helpers/wrap-props ~argsym)]
                  arg                                [arg argsym]
                  :else                              [])]
          ~@(butlast body)

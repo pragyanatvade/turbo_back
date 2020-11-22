@@ -1,12 +1,12 @@
 (ns com.vadelabs.turbo.dom
   (:refer-clojure :exclude [ref deref])
-  (:require-macros [com.vadelabs.turbo.dom :refer [defui fnui]])
+  (:require-macros [com.vadelabs.turbo.dom :refer [fnui]])
   (:require
    ["react" :as react]
    ["react-dom" :as rdom]
    ["react/cjs/react-jsx-runtime.production.min" :as jsx-runtime]
    [goog.functions :as gf]
-   [com.vadelabs.turbo.dom.utils :as du]))
+   [com.vadelabs.turbo.dom.helpers :as du]))
 
 (def Component react/Component)
 (def Fragment react/Fragment)

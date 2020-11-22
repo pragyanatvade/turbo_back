@@ -22,10 +22,13 @@
    :color-scheme :gray})
 
 (def Badge
-  {:base-style    {:px             1
-                   :text-transform "uppercase"
-                   :font-size      "xs"
-                   :border-radius  "sm"
-                   :font-weight    "bold"}
-   :variants      variants
-   :default-props default-props})
+  {:base     {:px             1
+              :text-transform "uppercase"
+              :font-size      "xs"
+              :border-radius  "sm"
+              :font-weight    "bold"}
+   :variants variants
+   :default  default-props})
+
+(def components
+  {:Badge Badge})

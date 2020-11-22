@@ -1,9 +1,10 @@
 (ns com.vadelabs.turbo.styled.parser-test
   (:require
-   [nubank.workspaces.core :as ws :refer [deftest]]
-   [cljs.test :refer [is testing]]
-   [com.vadelabs.turbo.styled.parser :as p]))
-
+   [devcards.core :as dc]
+   [com.vadelabs.turbo.styled.parser :as p])
+  (:require-macros
+   [devcards.core :as dc :refer [deftest]]
+   [cljs.test :refer [is testing]]))
 
 (deftest background
   (testing "returns background styles"
@@ -75,6 +76,37 @@
       (is (= style {:color "gold"
                     :fill  "tomato"})))))
 
+(deftest flexbox
+  (testing "returns flexbox styles"
+    (let [style (p/flexbox {:align-items "center"
+                            :flex        "1 1 auto"}
+                           p/style-keys p/pseudo-keys)]
+      (is (= style {:align-items "center"
+                    :flex        "1 1 auto"})))))
+
+(deftest grid
+  (testing "returns grid styles"
+    (let [style (p/grid {:grid-gap 32} p/style-keys p/pseudo-keys)]
+      (is (= style {:grid-gap 32})))))
+
+(deftest layout
+  (testing "returns layout styles"
+    (let [style (p/layout {:width      [1 0.5 0.25]
+                           :min-height 32
+                           :max-width  768}
+                          p/style-keys p/pseudo-keys)]
+      (is (= style {:width      "100%"
+                    :min-height 32
+                    :max-width  768}))
+      (is (= (:media (meta style)) {{:screen true :min-width "40em"} {:width "50%"}
+                                    {:screen true :min-width "52em"} {:width "25%"}}))
+      (is (= (:pseudo (meta style)) {}))))
+  (testing "returns 0 from theme.sizes"
+    (let [style (p/layout {:theme  {:sizes [ 24 48 96]}
+                           :width  0
+                           :height 0} p/style-keys p/pseudo-keys)]
+      (is (= style {:width 24 :height 24})))))
+
 (deftest position
   (testing "returns position styles"
     (let [style (p/position {:position "absolute" :top 0 :right 0}
@@ -92,3 +124,30 @@
                             p/style-keys
                             p/pseudo-keys)]
       (is (= style {:top "1px" :right "2px" :bottom "3px" :left "4px"})))))
+
+(deftest shadow
+  (testing "returns shadow styles"
+    (let [style (p/shadow {:theme       {:shadows {:small "0 1px 4px rgba(0,0,0,.125)"}}
+                           :text-shadow "0 -1px rgba(255,255,255,.25)"
+                           :box-shadow  "small"}
+                          p/style-keys p/pseudo-keys)]
+      (is (= style {:text-shadow "0 -1px rgba(255,255,255,.25)"
+                    :box-shadow  "0 1px 4px rgba(0,0,0,.125)"})))))
+(deftest space
+  (testing "returns style objects"
+    (let [style (p/space {:m "4px"}
+                         p/style-keys p/pseudo-keys)]
+      (is (= style {:margin "4px"}))))
+  (testing "returns 0 values"
+    (let [style (p/space {:m 0}
+                         p/style-keys p/pseudo-keys)]
+      (is (= style {:margin 0}))))
+  (testing "returns negative pixel values"
+    (let [style (p/space {:m -2}
+                         p/style-keys p/pseudo-keys)]
+      (is (= style {:margin -8}))))
+  (testing "returns negative em values"
+    (let [style (p/space {:m "-16em"}
+                         p/style-keys p/pseudo-keys)]
+      (is (= style {:margin "-16em"}))))
+  )

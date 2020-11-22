@@ -44,7 +44,6 @@
 
   )
 
-
 (defn- filter-props
   [props coll]
   (into {} (filter

@@ -1,4 +1,4 @@
-(ns com.vadelabs.turbo.themes.utils
+(ns com.vadelabs.turbo.themes.helpers
   (:require [clojure.string :as str]
             [cljs.reader :refer [read-string]]))
 

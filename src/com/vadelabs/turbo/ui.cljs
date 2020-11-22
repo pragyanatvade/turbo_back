@@ -3,6 +3,7 @@
   (:require
    [com.vadelabs.turbo.ui.layout :as l]))
 
+(def Badge l/Badge)
 (def Box l/Box)
 (def Square l/Square)
 (def Circle l/Circle)

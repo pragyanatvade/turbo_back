@@ -1,10 +1,14 @@
 (ns com.vadelabs.turbo.themes
   (:require
+   [taoensso.encore :as enc]
+   [com.vadelabs.turbo.themes.components :refer [components]]
    [com.vadelabs.turbo.themes.foundation :refer [foundation]]
    [com.vadelabs.turbo.dom :as dom]))
 
 
-(def theme foundation)
+(def theme (enc/merge
+             components
+             foundation))
 
 (defn build
   [_]

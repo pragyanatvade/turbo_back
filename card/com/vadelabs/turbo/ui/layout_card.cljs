@@ -1,12 +1,49 @@
 (ns com.vadelabs.turbo.ui.layout-card
   (:require
-   [nubank.workspaces.core :as ws :refer [defcard]]
-   [com.vadelabs.turbo.cards :refer [turbo-card]]
-   [com.vadelabs.turbo.ui.layout :as ui]
-   [com.vadelabs.turbo.dom :as dom :refer [defui]]))
+   [devcards.core :as dc]
+   [com.vadelabs.turbo.dom :as dom :refer [defui]]
+   [com.vadelabs.turbo.ui.layout :as ui])
+  (:require-macros
+   [devcards.core :refer [defcard]]))
 
+(defui BasicBadgeUI
+  []
+  [:& ui/Badge {} "Success"])
+(defcard BasicBadge BasicBadgeUI)
 
-(defui Basic
+(defui SolidBadgeUI
+  []
+  [:*
+   (for [color-scheme ["gray" "green" "red" "orange" "purple" "teal"]]
+     [:& ui/Badge {:key          color-scheme
+                   :color-scheme color-scheme
+                   :variant      "solid"
+                   :mr           2} color-scheme])])
+
+(defcard SolidBadge SolidBadgeUI)
+
+(defui SubtleBadgeUI
+  []
+  [:*
+   (for [color-scheme ["gray" "green" "red" "orange" "purple" "teal"]]
+     [:& ui/Badge {:key          color-scheme
+                   :color-scheme color-scheme
+                   :mr           2} color-scheme])])
+(defcard SubtleBadge SubtleBadgeUI)
+
+(defui OutlineBadgeUI
+  []
+  [:*
+   (for [color-scheme ["gray" "green" "red" "orange" "purple" "teal"]]
+     [:& ui/Badge {:key          color-scheme
+                   :color-scheme color-scheme
+                   :variant      "outline"
+                   :mr           2} color-scheme])])
+
+(defcard OutlineBadge OutlineBadgeUI)
+
+;; BOX LAYOUT COMPONENT ;;
+(defui BasicUI
   []
   [:& ui/Box {}
    [:& ui/Box {:color ["tomato" "purple"]
@@ -19,10 +56,9 @@
                           :content        "\"\""
                           :display        "block"
                           :padding-bottom ["40px" "100px"]}}]])
-(defcard BasicCard
-  (turbo-card Basic))
+(defcard Basic BasicUI)
 
-(defui Square
+(defui SquareUI
   []
   [:& ui/Square {:bg   "red.300"
                  :size ["40px" "60px" "100px"]}
@@ -31,10 +67,9 @@
                   :color "white"}
     "BOX"]])
 
-(defcard SquareCard
-  (turbo-card Square))
+(defcard Square SquareUI)
 
-(defui Center
+(defui CenterUI
   []
   [:& ui/Center {:bg "#da3d6929"
                  :w  "480px"
@@ -43,10 +78,9 @@
                :bg "green.600"}
     "BOX"]])
 
-(defcard CenterCard
-  (turbo-card Center))
+(defcard Center CenterUI)
 
-(defui Spacer
+(defui SpacerUI
   []
   [:& ui/Flex {:color     ["green.400" "tomato"]
                :direction {:base "column" :md "row"}}
@@ -58,17 +92,14 @@
                :box-size "100px"}
     "Box 2"]])
 
-(defcard SpacerCard
-  (turbo-card Spacer))
+(defcard Spacer SpacerUI)
 
-(defui Code
+(defui CodeUI
   []
   [:& ui/Code {:color-scheme "pink"} "import React from react"])
-(defcard CodeCard
-  []
-  (turbo-card Code))
+(defcard Code CodeUI)
 
-(defui Container
+(defui ContainerUI
   []
   [:& ui/Container {:max-width "md"}
    [:p "Lorem Ipsum is simply dummy text of the printing and typesetting industry.
@@ -80,13 +111,11 @@
         sheets containing Lorem Ipsum passages, and more recently with desktop
         publishing software like Aldus PageMaker including versions of Lorem
         Ipsum."]])
-(defcard ContainerCard
-  []
-  (turbo-card Container))
+(defcard Container ContainerUI)
 
-(defui Divider
+(defui DividerUI
   []
   [:& ui/Divider])
-(defcard DividerCard
-  []
-  (turbo-card Divider))
+
+(defcard Divider DividerUI)
+

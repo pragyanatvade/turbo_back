@@ -405,6 +405,7 @@
    :overflow-wrap   true
    :text-overflow   true
    :text-transition true
+   :text-transform  true
    :white-space     true
    :text-decoration true
    :text-decor      {:property :text-decoration}})

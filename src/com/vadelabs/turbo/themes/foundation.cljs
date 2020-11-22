@@ -1,5 +1,7 @@
 (ns com.vadelabs.turbo.themes.foundation
-  (:require [com.vadelabs.turbo.themes.utils :as utils]))
+  (:require
+   [taoensso.encore :as enc]
+   [com.vadelabs.turbo.themes.helpers :as utils]))
 
 (def borders
   {:none 0
@@ -258,7 +260,7 @@
    :96 "24rem"})
 
 (def sizes
-  (merge
+  (enc/merge
     space
     {:container {:sm "640px"
                  :md "768px"
