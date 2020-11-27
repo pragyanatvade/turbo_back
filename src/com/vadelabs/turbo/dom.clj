@@ -25,9 +25,10 @@
              [klass {} nil]))
         ([_ klass props & children]
          (let [klass klass]
-           (if (map? props)
-             [klass (to-js-map props) children]
-             [klass (list 'com.vadelabs.turbo.dom.helpers/map->obj props) children]))))
+           (cond
+             (map? props)    [klass (to-js-map props) children]
+             (symbol? props) [klass (list 'com.vadelabs.turbo.dom.helpers/map->obj props) children]
+             :else           [klass {} (cons props children)]))))
    :* (fn [_ attrs & children]
         (if (map? attrs)
           ['com.vadelabs.turbo.dom/Fragment attrs children]
@@ -41,6 +42,7 @@
         result  (-> body
                     (hicada.compiler/compile options handlers &env))]
     result))
+
 
 (defmethod hc/compile-form "cond"
   [[_ & clauses]]

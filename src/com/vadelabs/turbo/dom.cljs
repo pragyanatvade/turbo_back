@@ -87,7 +87,7 @@
 
 (defn useLayoutEffect
   [f deps]
-  (react/useLayoutEffec f deps))
+  (react/useLayoutEffect f deps))
 
 (defn useContext
   [ctx]

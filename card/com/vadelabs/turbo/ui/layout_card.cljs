@@ -18,7 +18,7 @@
      [:& ui/Badge {:key          color-scheme
                    :color-scheme color-scheme
                    :variant      "solid"
-                   :mr           2} color-scheme])])
+                   :mr           "2"} color-scheme])])
 
 (defcard SolidBadge SolidBadgeUI)
 
@@ -28,7 +28,7 @@
    (for [color-scheme ["gray" "green" "red" "orange" "purple" "teal"]]
      [:& ui/Badge {:key          color-scheme
                    :color-scheme color-scheme
-                   :mr           2} color-scheme])])
+                   :mr           "2"} color-scheme])])
 (defcard SubtleBadge SubtleBadgeUI)
 
 (defui OutlineBadgeUI
@@ -38,7 +38,7 @@
      [:& ui/Badge {:key          color-scheme
                    :color-scheme color-scheme
                    :variant      "outline"
-                   :mr           2} color-scheme])])
+                   :mr           "2"} color-scheme])])
 
 (defcard OutlineBadge OutlineBadgeUI)
 
@@ -119,3 +119,71 @@
 
 (defcard Divider DividerUI)
 
+
+(defui HorizontalDividerUI
+  []
+  [:& ui/Divider {:orientation "horizontal"}])
+
+(defcard HorizontalDivider HorizontalDividerUI)
+
+
+(defui VerticalDividerUI
+  []
+  [:& ui/Divider {:orientation "vertical"}])
+
+(defcard VerticalDivider VerticalDividerUI)
+
+
+(defui DashedDividerUI
+  []
+  [:& ui/Divider {:variant "dashed"}])
+
+(defcard DashedDivider DashedDividerUI)
+
+
+(defui KbdUI
+  []
+  [:& ui/Kbd "Ctrl + L"])
+(defcard Kbd KbdUI)
+
+(defui HeadingUI
+  []
+  [:& ui/Heading "Heading 1"])
+(defcard Heading HeadingUI)
+
+(defui GridWithColumnsUI
+  []
+  [:& ui/SimpleGrid {:columns [2 nil 3]
+                     :spacing "40px"}
+   [:*
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    ]])
+(defcard GridWithColumns GridWithColumnsUI)
+
+(defui GridWithAutofitUI
+  []
+  [:& ui/SimpleGrid {:min-child-width "300px"
+                     :spacing         "40px"}
+   [:*
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    [:& ui/Box {:bg "tomato" :height "200px"}]
+    ]])
+(defcard GridWithAutofit GridWithAutofitUI)
+
+(defui GridWithColSpanUI
+  []
+  [:& ui/SimpleGrid {:columns {:base 2 :md 4}
+                     :spacing {:base "24px" :md "40px"}}
+   [:*
+    [:& ui/GridItem {:bg       "green.500"
+                     :col-span {:base 1 :md 3}} "Column 1"]
+    [:& ui/GridItem {:bg       "pink.500"
+                     :col-span {:base 1 :md 1}} "Column 2"]]])
+(defcard GridWithColSpan GridWithColSpanUI)

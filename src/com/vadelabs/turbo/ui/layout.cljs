@@ -4,7 +4,8 @@
    [taoensso.encore :as enc]
    [com.vadelabs.turbo.dom :as dom :refer [defui]]
    [com.vadelabs.turbo.styled :refer [stylify]]
-   [com.vadelabs.turbo.ui.helpers :as tuh]))
+   [com.vadelabs.turbo.ui.helpers :as tuh]
+   [com.vadelabs.turbo.themes.helpers :as thh]))
 
 
 (defui Box
@@ -69,22 +70,37 @@
   "Turbo component to horizontally and vertically center it's children"
   [props]
   (let [{:keys [children]} props
+        style              {}
         rest               (dissoc props :children)
         rest               (assoc rest
-                                  :turbo$css {:display         "flex"
-                                              :align-items     "center"
-                                              :justify-content "center"})]
+                                  :turbo$css (assoc style
+                                                    :display         "flex"
+                                                    :align-items     "center"
+                                                    :justify-content "center"))]
     [:& Box rest children]))
 
 (defui Code
   "Turbo component to render inline code snippets"
   [props]
   (let [{:keys [children]} props
+        style              (tuh/use-style-config :Code props)
         rest               (dissoc props :children)
         rest               (assoc rest
-                                  :as :code
-                                  :turbo$css {:display "inline-block"})]
+                                  :turbo$css (assoc
+                                               style
+                                               :display "inline-block")
+                                  :as                "code")]
     [:& Box rest children]))
+
+(defn- transform
+  [props]
+  (reduce-kv
+    (fn [acc prop prop-value]
+      (if prop-value
+        (assoc acc prop (str "container." prop-value))
+        acc))
+    {}
+    props))
 
 (defui Container
   "Turbo component to wrap app or website content
@@ -97,6 +113,12 @@
                                                          :width :min-width
                                                          :w :min-w :max-w :center?
                                                          :children)
+        width-props                              (transform {:max-w     max-w
+                                                             :max-width max-width
+                                                             :width     width
+                                                             :w         w
+                                                             :min-width min-width
+                                                             :min-w     min-w})
         turbo-css                                {:w     "100%"
                                                   :mx    "auto"
                                                   :max-w "60ch"
@@ -108,7 +130,7 @@
                                                           :align-items "center")
                                                    turbo-css)
         rest                                     (assoc rest
-                                                        :turbo$css turbo-css)]
+                                                        :turbo$css (enc/merge turbo-css width-props))]
     [:& Box rest children]))
 
 (defui Divider
@@ -116,20 +138,26 @@
    It display a thin horizontal or vertical line, and renders a `hr` tag"
   [props]
   (let [{:keys [children orientation]
-         :or   {orientation :horizontal}} props
-        style                             {:vertical   {:border-left-width "1px"
-                                                        :height            "100%"}
-                                           :horizontal {:border-bottom-width "1px"
-                                                        :width               "100px"}}
-        turbo-css                         (assoc ((keyword orientation) style)
-                                                 :border "0"
-                                                 :opacity 0.6
-                                                 :border-color "inherit"
-                                                 :border-style "solid")
-        rest                              (dissoc props :children :orientation)
-        rest                              (assoc rest
-                                                 :turbo$css turbo-css
-                                                 :as :hr)]
+         :or   {orientation "horizontal"}} props
+        style                              (tuh/use-style-config :Divider props)
+        {:keys [border-left-width
+                border-right-width
+                border-width
+                border-bottom-width
+                border-top-width]}         style
+
+        divider-styles {:vertical   {:border-left-width (or border-left-width border-right-width border-width "1px")
+                                     :height            "100%"}
+                        :horizontal {:border-bottom-width (or border-bottom-width border-top-width border-width "1px")
+                                     :width               "100px"}}
+        divider-style  ((keyword orientation) divider-styles)
+        turbo-css      (enc/merge style divider-style)
+        rest           (dissoc props :children :orientation)
+        rest           (assoc rest
+                              :turbo$css turbo-css
+                              :role "separator"
+                              :aria-orientation orientation
+                              :as :hr)]
     [:& Box rest children]))
 
 (defui Flex
@@ -140,12 +168,7 @@
                 justify wrap
                 basis grow
                 shrink children]} props
-        rest                      (dissoc props :direction
-                                          :align :justify
-                                          :wrap :basis
-                                          :grow :shrink
-                                          :children)
-        rest                      (assoc rest
+        props                     (assoc props
                                          :turbo$css {:display         "flex"
                                                      :flex-direction  direction
                                                      :align-items     align
@@ -154,7 +177,7 @@
                                                      :flex-basis      basis
                                                      :flex-grow       grow
                                                      :flex-shrink     shrink})]
-    [:& Box rest children]))
+    [:& Box props children]))
 
 (defui Grid
   "Turbo layout component to create grid layouts.
@@ -165,13 +188,7 @@
                 column-gap column row auto-flow
                 auto-rows template-rows auto-columns
                 template-columns children]} props
-        rest                                (dissoc props :children :area
-                                                    :template-areas :gap
-                                                    :row-gap :column-gap
-                                                    :column :row :auto-flow
-                                                    :auto-rows :template-rows
-                                                    :auto-columns :template-columns)
-        rest                                (assoc rest
+        props                               (assoc props
                                                    :turbo$css {:display               "grid"
                                                                :grid-area             area
                                                                :grid-template-areas   template-areas
@@ -185,40 +202,57 @@
                                                                :grid-auto-rows        auto-rows
                                                                :grid-template-rows    template-rows
                                                                :grid-template-columns template-columns})]
-    [:& Box rest children]))
+    [:& Box props children]))
+(defn- span-fn
+  [span?]
+  (cond
+    (vector? span?) (into [] (map (fn [item]
+                                    (if (= item "auto")
+                                      "auto"
+                                      (str "span " item "/span " item))) span?))
+    (map? span?)    (reduce-kv
+                      (fn [acc key val]
+                        (if (= val "auto")
+                          (assoc acc key "auto")
+                          (assoc acc key (str " span " val "/span " val))))
+                      {}
+                      span?)
+    (nil? span?)    span?
+    :else           (str "span " span? "/span " span?)))
 
 (defui GridItem
   [props]
   (let [{:keys [col-span col-start col-end
                 row-end row-span row-start
                 children]} props
-        rest               (dissoc props :children
-                                   :col-span :col-start :col-end
-                                   :row-end :row-span :row-start)
-        rest               (assoc rest
-                                  :turbo$css {:grid-column       col-span
-                                              :grid-row          row-span
+        props              (assoc props
+                                  :turbo$css {:grid-column       (span-fn col-span)
+                                              :grid-row          (span-fn  row-span)
                                               :grid-column-start col-start
                                               :grid-column-end   col-end
                                               :grid-row-start    row-start
                                               :grid-row-end      row-end})]
-    [:& Box rest children]))
+    [:& Box props children]))
 
 (defui Heading
   [props]
   (let [{:keys [children]} props
+        style              (tuh/use-style-config :Heading props)
         rest               (dissoc props :children)
         rest               (assoc rest
+                                  :turbo$css style
                                   :as :h2)]
     [:& Box rest children]))
 
 (defui Kbd
   [props]
   (let [{:keys [children]} props
+        style              (tuh/use-style-config :Kbd props)
         rest               (dissoc props :children)
         rest               (assoc rest
-                                  :turbo$css {:font-family "mono"}
-                                  :as :kbd)]
+                                  :turbo$css (assoc style
+                                                    :font-family "mono")
+                                  :as                :kbd)]
     [:& Box rest children]))
 
 (defui LinkOverlay
@@ -305,37 +339,60 @@
     [:& Box rest children]))
 
 
+(defn- width-to-columns
+  [count]
+  (if (vector? count)
+    (into [] (map (fn [item]
+                    (if (nil? item)
+                      nil
+                      (str "repeat(auto-fit, minmax(" item ", 1fr)")))
+                  count))
+    (str "repeat(auto-fit, minmax(" count ", 1fr))")))
+
+(defn- count-to-columns
+  [count]
+  (cond
+    (vector? count) (into [] (map (fn [item]
+                                    (if (nil? item)
+                                      nil
+                                      (str "repeat(" item ", 1fr)"))) count))
+    (map? count)    (reduce-kv
+                      (fn [acc key val]
+                        (if (nil? val)
+                          acc
+                          (assoc acc key (str "repeat(" val ", 1fr)"))))
+                      {}
+                      count)
+    :else           (str "repeat(" count ", 1fr)")))
+
 (defui SimpleGrid
   [props]
   (let [{:keys [children columns spacing-x spacing-y
                 spacing min-child-width]} props
-        rest                              (dissoc props :children
-                                                  :columns :spacing-x
-                                                  :spacing-y :spacing :min-child-width)
         template-columns                  (if min-child-width
-                                            []
-                                            [])
-        rest                              (assoc rest
+                                            (width-to-columns min-child-width)
+                                            (count-to-columns columns))
+        props                             (assoc props
                                                  :gap spacing
                                                  :column-gap spacing-x
                                                  :row-gap spacing-y
                                                  :template-columns template-columns)]
-    [:& Grid rest children]))
+    [:& Grid props children]))
 
 (defui Spacer
-  "A flexible flex spacer that expands along the major axis of its containing
+"A flexible flex spacer that expands along the major axis of its containing
    flex layout. It renders `dev` by default, and takes up any available space."
-  [props]
+[props]
   (let [{:keys [children]} props
         rest               (dissoc props :children)
         rest               (assoc rest
                                   :turbo$css {:flex         1
                                               :justify-self "stretch"
                                               :align-self   "stretch"})]
-    [:& Box rest children]))
+  [:& Box rest children]))
 
 (defui StackDivider
-  [props]
+[props]
   (let [{:keys [children turbo$css]} props
         rest                         (dissoc props :children :turbo$css)
         rest                         (assoc rest
@@ -345,10 +402,10 @@
                                             :border-color "inherit"
                                             :width "auto"
                                             :height "auto")]
-    [:& Box rest children]))
+  [:& Box rest children]))
 
 (defui StackItem
-  [props]
+[props]
   (let [{:keys [children turbo$css]} props
         rest                         (dissoc props :children :turbo$css)
         rest                         (assoc rest
@@ -356,7 +413,7 @@
                                             :display "inline-block"
                                             :flex "0 0 auto"
                                             :min-width 0)]
-    [:& Box rest children]))
+  [:& Box rest children]))
 
 
 (defui Stack

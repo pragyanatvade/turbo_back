@@ -103,9 +103,24 @@
 ;;   [:& ui/Divider {:border-color "red"
 ;;                   :orientation  :vertical}])
 
+;; (defui Root
+;;   []
+;;   [:& ui/Badge {} "Success"])
+
+(def theme-context (dom/create-context "light"))
+
+
+(defui TEST
+  [props]
+  (println "TEST" props (dom/use-context theme-context))
+  [:div {} "HELLO WORLD"])
+
 (defui Root
   []
-  [:& ui/Badge {} "Success"])
+  (let [provider (dom/provider theme-context)]
+    [:& provider {:value "hello"}
+     [:& TEST {} "Hello World"]]))
+
 
 ;; (defui Root
 ;;   []
@@ -137,12 +152,12 @@
 ;;    "HELLO WORLD"])
 
 (defn ^:export init
-  []
-  (dom/attach (dom/element Root) (gdom/getElement "app"))
-  (js/console.log "Loaded"))
+[]
+(dom/attach (dom/element Root) (gdom/getElement "app"))
+(js/console.log "Loaded"))
 
 (defn ^:export refresh
-  []
-  (dom/detach (gdom/getElement "app"))
-  (dom/attach (dom/element Root) (gdom/getElement "app"))
-  (js/console.log "Hot reloaded"))
+[]
+(dom/detach (gdom/getElement "app"))
+(dom/attach (dom/element Root) (gdom/getElement "app"))
+(js/console.log "Hot reloaded"))
