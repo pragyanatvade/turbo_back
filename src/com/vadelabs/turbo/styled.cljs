@@ -32,6 +32,14 @@
          (str/join " "))
     (throw (ex-info "join takes one or more strings as arguments" (s/explain-data :com.vadelabs.turbo.styled.spec/classes classes)))))
 
+(comment
+
+  (def props {:pl :1})
+  (def theme (themes/build props))
+  (p/space (assoc props :theme theme) p/style-keys p/pseudo-keys)
+
+  )
+
 (defn stylify
   [props]
   (let [theme (get props :theme (themes/build props))

@@ -1,6 +1,7 @@
 (ns com.vadelabs.turbo.themes.helpers
   (:require [clojure.string :as str]
-            [cljs.reader :refer [read-string]]))
+            [cljs.reader :refer [read-string]]
+            [garden.color :as color]))
 
 (defn create-breakpoints
   [config]
@@ -37,14 +38,25 @@
           (* (rgb 2) 114))
        1000)))
 
+(defn- gen-path
+  [path]
+  (let [p (if (string? path)
+            (str/split path ".")
+            [path])]
+    (into [:colors] (map (fn [item]
+                           (if (string? item)
+                             (keyword item)
+                             item))
+                         p))))
+
 (defn get-color
   ([theme color]
    (get-color theme color nil))
-  ([theme color fallback]
-   (let [hex (get-in theme [:colors (keyword color)] color)]
+  ([theme color not-found]
+   (let [hex (get-in theme (gen-path color) color)]
      (if (valid-hex? hex)
        hex
-       fallback))))
+       not-found))))
 
 (defn dark?
   ([color]
@@ -77,6 +89,18 @@
         vertical
         horizontal))))
 
+(defn transparentize
+  [color opacity]
+  (fn [theme]
+    (let [raw (get-color theme color)]
+      (color/as-hex (color/transparentize raw opacity)))))
+
+(defn mode
+  [light dark]
+  (fn [{:keys [color-mode]}]
+    (if (= :dark (keyword color-mode))
+      dark
+      light)))
 
 (comment
 

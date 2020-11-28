@@ -227,6 +227,12 @@
    :none    "none"
    :dark-lg "rgba(0, 0, 0, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.2) 0px 5px 10px, rgba(0, 0, 0, 0.4) 0px 15px 40px"})
 
+(comment
+
+  (keyword "1")
+
+  )
+
 (def space
   {:px "1px"
    :0  "0"
@@ -258,6 +264,12 @@
    :72 "18rem"
    :80 "20rem"
    :96 "24rem"})
+
+(comment
+
+  (:px space)
+
+  )
 
 (def sizes
   (enc/merge
@@ -380,7 +392,9 @@
                   :colors      colors
                   :sizes       sizes
                   :shadows     shadows
+                  :space space
                   :transition  transition))
+
 (comment
   (utils/create-breakpoints {"sm" "30em"
                              "md" "23em"})

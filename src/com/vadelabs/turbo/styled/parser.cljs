@@ -1,7 +1,8 @@
 (ns com.vadelabs.turbo.styled.parser
   (:refer-clojure :exclude [list])
   (:require
-   [com.vadelabs.turbo.styled.system :refer [system]]))
+   [com.vadelabs.turbo.styled.system :refer [system]]
+   [taoensso.encore :as enc]))
 
 
 ;; DEFAULTS ;;
@@ -47,21 +48,21 @@
    :border-color               {:property :border-color
                                 :scale    :border-colors}
    :border-radius              {:property :border-radius
-                                :scale    :radii}
+                                :scale    :radius}
    :border-top                 {:property :border-top
                                 :scale    :borders}
    :border-top-left-radius     {:property :border-top-left-radius
-                                :scale    :radii}
+                                :scale    :radius}
    :border-top-right-radius    {:property :border-top-right-radius
-                                :scale    :radii}
+                                :scale    :radius}
    :border-right               {:property :border-right
                                 :scale    :borders}
    :border-bottom              {:property :border-bottom
                                 :scale    :borders}
    :border-bottom-left-radius  {:property :border-bottom-left-radius
-                                :scale    :radii}
+                                :scale    :radius}
    :border-bottom-right-radius {:property :border-bottom-right-radius
-                                :scale    :radii}
+                                :scale    :radius}
    :border-left                {:property :border-left
                                 :scale    :borders}
    :border-x                   {:properties [:border-left :border-right]
@@ -93,13 +94,13 @@
    :border-right-style         {:property :border-right-style
                                 :scale    :border-styles}
    :border-top-radius          {:properties [:border-top-left-radius :border-top-right-radius]
-                                :scale      :radii}
+                                :scale      :radius}
    :border-bottom-radius       {:properties [:border-bottom-left-radius :border-bottom-right-radius]
-                                :scale      :radii}
+                                :scale      :radius}
    :border-left-radius         {:properties [:border-top-left-radius :border-bottom-left-radius]
-                                :scale      :radii}
+                                :scale      :radius}
    :border-right-radius        {:properties [:border-top-right-radius :border-bottom-right-radius]
-                                :scale      :radii}})
+                                :scale      :radius}})
 (def ^:private border-aliases
   (assoc border-config
          :rounded (:border-radius border-config)
@@ -413,7 +414,7 @@
   typography-config)
 (def typography (system typography-aliases))
 
-(def config (merge
+(def config (enc/merge
               background-aliases
               border-aliases
               color-aliases
@@ -432,5 +433,6 @@
 
 (def parse (system config))
 
-(def pseudo-keys #{:hover :before})
+(def pseudo-keys #{:hover :before :focus})
+(def combinator-keys #{:> :-})
 (def style-keys (set (keys config)))
