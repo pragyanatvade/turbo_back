@@ -1,4 +1,4 @@
-{:lint-as {com.vadelabs.turbo.dom/defui clojure.core/defn
-           devcards.core/deftest        cljs.test/deftest
-           devcards.core/defcard        cljs.test/deftest}
+{:lint-as {com.vadelabs.turbo.elements/defui clojure.core/defn
+           devcards.core/deftest             cljs.test/deftest
+           devcards.core/defcard             cljs.test/deftest}
  :linters {}}

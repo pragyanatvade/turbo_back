@@ -1,10 +1,13 @@
 (ns workspace
   (:require
-   [com.vadelabs.turbo.dom :as dom :refer [defui]]
-   [goog.dom :as gdom]
-   [com.vadelabs.turbo.ui :as ui]
-   [com.vadelabs.turbo.themes :as themes]
-   [com.vadelabs.turbo.styled :refer [<class]]))
+   ;; [com.vadelabs.turbo.dom :as dom :refer [defui]]
+   ;; [goog.dom :as gdom]
+   ["react-dom" :as rdom]
+   ;; [com.vadelabs.turbo.ui :as ui]
+   ;; [com.vadelabs.turbo.themes :as themes]
+   ;; [com.vadelabs.turbo.styled :refer [<class]]
+   [com.vadelabs.turbo.dom :as d]
+   [com.vadelabs.turbo.components :as comp :refer [defui]]))
 
 ;; (defui Root
 ;;   []
@@ -123,24 +126,24 @@
 ;;      [:& TEST {} "Hello World"]]))
 
 
-(def selectors
-  ^{:combinators {
-                  [:> "*:not(style)"] {:margin-top "1rem" :margin-left "0"}
-                  [:- "*:not(style)"] {:margin-top "1rem" :margin-left "0"}
-                  }}
-  {:display        "flex"
-   :flex-direction "column"})
+;; (def selectors
+;;   ^{:combinators {
+;;                   [:> "*:not(style)"] {:margin-top "1rem" :margin-left "0"}
+;;                   [:- "*:not(style)"] {:margin-top "1rem" :margin-left "0"}
+;;                   }}
+;;   {:display        "flex"
+;;    :flex-direction "column"})
 
-(defui Root
-  []
-  [:div
-   [:div {:class (<class selectors)}
-    [:span "asdasdasd"]
-    [:span "ooooh"]
-    [:span "12312weqweq"]]
-   [:div {:class (<class selectors)}
-    [:span "1231231"]
-    [:span "bhsdids"]]])
+;; (defui Root
+;;   []
+;;   [:div
+;;    [:div {:class (<class selectors)}
+;;     [:span "asdasdasd"]
+;;     [:span "ooooh"]
+;;     [:span "12312weqweq"]]
+;;    [:div {:class (<class selectors)}
+;;     [:span "1231231"]
+;;     [:span "bhsdids"]]])
 
 ;; (defui Root
 ;;   []
@@ -171,13 +174,21 @@
 ;;                                                       {:background-color "tomato"}}})}}))}
 ;;    "HELLO WORLD"])
 
+(defui app
+  [props]
+  (println "PROPS" props)
+  (d/h1 "HELLO "))
+
+(def app-ui (comp/factory app))
+
 (defn ^:export init
   []
-  (dom/attach (dom/element Root) (gdom/getElement "app"))
+  (rdom/render (app-ui {:a 1}) (js/document.getElementById "app"))
+  ;; (dom/attach (dom/element Root) (gdom/getElement "app"))
   (js/console.log "Loaded"))
 
 (defn ^:export refresh
-[]
-(dom/detach (gdom/getElement "app"))
-(dom/attach (dom/element Root) (gdom/getElement "app"))
-(js/console.log "Hot reloaded"))
+  []
+  ;; (dom/detach (gdom/getElement "app"))
+  ;; (dom/attach (dom/element Root) (gdom/getElement "app"))
+  (js/console.log "Hot reloaded"))
