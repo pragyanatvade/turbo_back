@@ -74,7 +74,7 @@
    :default {:size "xl"}})
 
 (def Divider
-  {:base     {:border "0"
+  {:base     {:border       "0"
               :opacity      "0.6"
               :border-color "inherit"}
    :variants {:solid  {:border-style "solid"}
@@ -92,10 +92,19 @@
             :line-height         "normal"
             :px                  "0.4em"
             :white-space         "nowrap"})})
+(def Link
+  {:base {:transition      "all 0.15s ease-out"
+          :cursor          "pointer"
+          :text-decoration "none"
+          :outline         "none"
+          :color           "inherit"
+          :hover           {:text-decoration "underline"}
+          :focus           {:box-shadow "outline"}}})
 
 (def components
   {:Badge   Badge
    :Kbd     Kbd
    :Heading Heading
    :Code    Code
-   :Divider Divider})
+   :Divider Divider
+   :Link    Link})

@@ -3,7 +3,8 @@
    [com.vadelabs.turbo.dom :as dom :refer [defui]]
    [goog.dom :as gdom]
    [com.vadelabs.turbo.ui :as ui]
-   [com.vadelabs.turbo.themes :as themes]))
+   [com.vadelabs.turbo.themes :as themes]
+   [com.vadelabs.turbo.styled :refer [<class]]))
 
 ;; (defui Root
 ;;   []
@@ -107,20 +108,39 @@
 ;;   []
 ;;   [:& ui/Badge {} "Success"])
 
-(def theme-context (dom/create-context "light"))
+;; (def theme-context (dom/create-context "light"))
 
 
-(defui TEST
-  [props]
-  (println "TEST" props (dom/use-context theme-context))
-  [:div {} "HELLO WORLD"])
+;; (defui TEST
+;;   [props]
+;;   (println "TEST" props (dom/use-context theme-context))
+;;   [:div {} "HELLO WORLD"])
+
+;; (defui Root
+;;   []
+;;   (let [provider (dom/provider theme-context)]
+;;     [:& provider {:value "hello"}
+;;      [:& TEST {} "Hello World"]]))
+
+
+(def selectors
+  ^{:combinators {
+                  [:> "*:not(style)"] {:margin-top "1rem" :margin-left "0"}
+                  [:- "*:not(style)"] {:margin-top "1rem" :margin-left "0"}
+                  }}
+  {:display        "flex"
+   :flex-direction "column"})
 
 (defui Root
   []
-  (let [provider (dom/provider theme-context)]
-    [:& provider {:value "hello"}
-     [:& TEST {} "Hello World"]]))
-
+  [:div
+   [:div {:class (<class selectors)}
+    [:span "asdasdasd"]
+    [:span "ooooh"]
+    [:span "12312weqweq"]]
+   [:div {:class (<class selectors)}
+    [:span "1231231"]
+    [:span "bhsdids"]]])
 
 ;; (defui Root
 ;;   []
@@ -152,9 +172,9 @@
 ;;    "HELLO WORLD"])
 
 (defn ^:export init
-[]
-(dom/attach (dom/element Root) (gdom/getElement "app"))
-(js/console.log "Loaded"))
+  []
+  (dom/attach (dom/element Root) (gdom/getElement "app"))
+  (js/console.log "Loaded"))
 
 (defn ^:export refresh
 []

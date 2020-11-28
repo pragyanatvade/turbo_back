@@ -3,18 +3,16 @@
   (:require
    [taoensso.encore :as enc]
    [com.vadelabs.turbo.dom :as dom :refer [defui]]
-   [com.vadelabs.turbo.styled :refer [stylify]]
    [com.vadelabs.turbo.ui.helpers :as tuh]
-   [com.vadelabs.turbo.themes.helpers :as thh]))
+   [com.vadelabs.turbo.ui.styled :refer [Block]]))
 
 
 (defui Box
   "Box is the most abstract component on top of which other turbo
    components are built. It renders a `div` element by default."
   [props]
-  (let [{:keys [as children]
-         :or   {as :div}} props]
-    [(name as) {:class (stylify props)} children]))
+  (let [{:keys [children]} props]
+    [:& Block props children]))
 
 (defui AspectRatio
   [props]
@@ -203,6 +201,7 @@
                                                                :grid-template-rows    template-rows
                                                                :grid-template-columns template-columns})]
     [:& Box props children]))
+
 (defn- span-fn
   [span?]
   (cond
@@ -260,19 +259,24 @@
   (let [{:keys [children]} props
         rest               (dissoc props :children)
         rest               (assoc rest
-                                  :turbo$css {:position "static"}
+                                  :turbo$css {:position "static"
+                                              :_before  {:content  "''"
+                                                         :cursor   "inherit"
+                                                         :display  "block"
+                                                         :position "absolute"
+                                                         :top      "0"
+                                                         :left     "0"
+                                                         :width    "100%"
+                                                         :height   "100%"}}
                                   :as :a)]
     [:& Box rest children]))
 
 (defui LinkBox
   [props]
-  (let [{:keys [children href target rel external?]} props
-        rest                                         (dissoc props :children
-                                                             :href :target :rel
-                                                             :external?)
-        rest                                         (assoc rest
-                                                            :turbo$css {:pos "relative"})]
-    [:& Box rest children
+  (let [{:keys [children href external?]} props
+        props                             (assoc props
+                                                 :turbo$css {:pos "relative"})]
+    [:& Box props children
      [:& LinkOverlay {:href   href
                       :target (when external? "_blank")
                       :rel    (when external? "noopener noreferrer")}]]))
@@ -280,63 +284,55 @@
 (defui Link
   [props]
   (let [{:keys [children external?]} props
-        rest                         (dissoc props :children
-                                             :external?)
-        rest                         (assoc rest
+        style                        (tuh/use-style-config :Link props)
+        props                        (assoc props
+                                            :turbo$css style
                                             :target (when external? "_blank")
                                             :rel (when external? "noopener noreferrer")
                                             :as :a)]
-    [:& Box rest children]))
+    [:& Box props children]))
 
 (defui List
   [props]
   (let [{:keys [as children style-type style-position spacing]
          :or   {style-type "none"}} props
-        rest                        (dissoc props :children
-                                            :style-type :style-position
-                                            :spacing
-                                            :as)
-        rest                        (assoc rest
+        props                       (assoc props
                                            :list-style-type style-type
                                            :list-style-position style-position
                                            :role "list"
                                            :turbo$css (if spacing {} {}) ;; TODO
                                            :as (or as :ul))]
-    [:& Box rest children]))
+    [:& Box props children]))
 
 (defui OrderedList
   [props]
   (let [{:keys [children]} props
-        rest               (dissoc props :children)
-        rest               (assoc rest
+        props              (assoc props
                                   :style-type "decimal"
                                   :margin-left "1em"
                                   :as :ol)]
-    [:& List rest children]))
+    [:& List props children]))
 
 (defui UnorderedList
   [props]
   (let [{:keys [children]} props
-        rest               (dissoc props :children)
-        rest               (assoc rest
+        props              (assoc props
                                   :style-type "initial"
                                   :margin-left "1em"
                                   :as :ul)]
-    [:& List rest children]))
+    [:& List props children]))
 
 (defui ListItem
   [props]
   (let [{:keys [children]} props
-        rest               (dissoc props :children)
-        rest               (assoc rest
+        props              (assoc props
                                   :as :li)]
-    [:& Box rest children]))
+    [:& Box props children]))
 
 (defui ListIcon
   [props]
-  (let [{:keys [children]} props
-        rest               (dissoc props :children)]
-    [:& Box rest children]))
+  (let [{:keys [children]} props]
+    [:& Box props children]))
 
 
 (defn- width-to-columns
@@ -392,20 +388,19 @@
   [:& Box rest children]))
 
 (defui StackDivider
-[props]
+  [props]
   (let [{:keys [children turbo$css]} props
-        rest                         (dissoc props :children :turbo$css)
-        rest                         (assoc rest
+        props                        (assoc props
                                             :turbo$css turbo$css
                                             :border-width 0
                                             :align-self "stretch"
                                             :border-color "inherit"
                                             :width "auto"
                                             :height "auto")]
-  [:& Box rest children]))
+    [:& Box props children]))
 
 (defui StackItem
-[props]
+  [props]
   (let [{:keys [children turbo$css]} props
         rest                         (dissoc props :children :turbo$css)
         rest                         (assoc rest
@@ -413,7 +408,26 @@
                                             :display "inline-block"
                                             :flex "0 0 auto"
                                             :min-width 0)]
-  [:& Box rest children]))
+    [:& Box rest children]))
+
+
+(defn- get-stack-styles
+  [direction spacing]
+  (let [styles {:column         {:mt spacing :ml "0"}
+                :row            {:ml spacing :mt "0"}
+                :column-reverse {:mb spacing :mr "0"}
+                :row-reverse    {:mr spacing :mb "0"}}]
+    {:combinators {[:> "*:not(style)"] (get styles (keyword direction))
+                   [:- "*:not(style)"] (get styles (keyword direction))}}))
+
+(defn- get-divider-styles
+  [direction spacing]
+  (let [styles {:column         {:my spacing :mx "0" :border-left-width "0" :border-bottom-width "1px"}
+                :row            {:mx spacing :my "0" :border-left-width "1px" :border-bottom-width "0"}
+                :column-reverse {:my spacing :mx "0" :border-left-width "0" :border-bottom-width "1px"}
+                :row-reverse    {:mx spacing :my "0" :border-left-width "1px" :border-bottom-width "0"}}]
+    {:& (direction styles)}))
+
 
 
 (defui Stack
@@ -421,35 +435,64 @@
   (let [{:keys [children inline? direction align justify
                 spacing wrap divider]
          :or   {spacing "0.5rem"}} props
-        rest                       (dissoc props :children
-                                           :inline? :direction :align
-                                           :justify :spacing :wrap :divider)
-        rest                       (assoc rest
-                                          :w :w)]
-    [:& Box rest children]))
+        direction                  (if inline?
+                                     "row"
+                                     (or direction "column"))
+        styles                     (get-stack-styles direction spacing)
+        divider?                   (not (nil? divider))
+        use-children?              (nil? divider)
+        clones                     (if use-children?
+                                     children
+                                     divider)
+        props                      (assoc props
+                                          :turbo$css (if divider?
+                                                       {}
+                                                       styles)
+                                          :display "flex"
+                                          :align-items align
+                                          :justify-content justify
+                                          :flex-direction direction
+                                          :flex-wrap wrap)]
+    [:& Box props clones]))
+
+(defui HStack
+[props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :align "center"
+                                  :direction "row")]
+  [:& Stack props children]))
+
+(defui VStack
+[props]
+(let [{:keys [children]} props
+      props              (assoc props
+                                :align "center"
+                                :direction "column")]
+  [:& Stack props children]))
 
 (defui Text
-  [props]
-  (let [{:keys [children align decoration casing]} props
-        rest                                       (dissoc props :children
-                                                           :align :decoration
-                                                           :casing)
-        rest                                       (assoc rest
-                                                          :text-align align
-                                                          :text-decoration decoration
-                                                          :text-transform casing
-                                                          :as :p)]
-    [:& Box rest children]))
+[props]
+(let [{:keys [children align decoration casing]} props
+      rest                                       (dissoc props :children
+                                                         :align :decoration
+                                                         :casing)
+      rest                                       (assoc rest
+                                                        :text-align align
+                                                        :text-decoration decoration
+                                                        :text-transform casing
+                                                        :as :p)]
+  [:& Box rest children]))
 
 (defui Wrap
-  [props]
+[props]
   (let [{:keys [children spacing justify direction align]} props
-        rest                                               (dissoc props :children
-                                                                   :spacing :justify :direction
-                                                                   :align)
-        rest                                               (assoc rest
-                                                                  :as :ul)]
-    [:& Box rest children]))
+      rest                                               (dissoc props :children
+                                                                 :spacing :justify :direction
+                                                                 :align)
+      rest                                               (assoc rest
+                                                                :as :ul)]
+  [:& Box rest children]))
 
 (defui WrapItem
   [props]

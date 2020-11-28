@@ -82,6 +82,7 @@
                                  props)
          style-props  (filter-props props style-keys)
          pseudo-props (filter-props props pseudo-keys)
+         comb-props   (:combinators props)
          style        (reduce-kv
                         (fn [acc key val]
                           (let [style-fn                      (key config)
@@ -131,34 +132,45 @@
                           (assoc acc key
                                  (parser config val style-keys pseudo-keys theme)))
                         {}
-                        pseudo-props)]
-     {:style  style
-      :media  media
-      :pseudo pseudo})))
+                        pseudo-props)
+         combinators  (reduce-kv
+                        (fn [acc key val]
+                          (assoc acc key (parser config val style-keys pseudo-keys theme)))
+                        {}
+                        comb-props)]
+     {:style       style
+      :media       media
+      :pseudo      pseudo
+      :combinators combinators})))
 
 (defn- create-parser
   [config]
   (fn [props style-keys pseudo-keys]
-    (let [parsed                       (parser config props style-keys pseudo-keys)
-          {:keys [style media pseudo]} parsed
-          pseudo-media                 (reduce-kv
-                                         (fn [acc key val]
-                                           (let [media (:media val)]
-                                             (when (not-empty media)
-                                               (let [m (reduce-kv
-                                                         (fn [acc query style]
-                                                           (assoc acc query {:pseudo {key style}}))
-                                                         {}
-                                                         media)]
-                                                 (enc/nested-merge acc m)))))
-                                         {}
-                                         pseudo)
-          pseudo-vals                  (reduce-kv
-                                         (fn [acc key val]
-                                           (assoc acc key (:style val)))
-                                         {}
-                                         pseudo)]
-      (with-meta style {:media (enc/nested-merge media pseudo-media) :pseudo pseudo-vals}))))
+    (let [parsed                                   (parser config props style-keys pseudo-keys)
+          {:keys [style media pseudo combinators]} parsed
+          pseudo-media                             (reduce-kv
+                                                     (fn [acc key val]
+                                                       (let [media (:media val)]
+                                                         (when (not-empty media)
+                                                           (let [m (reduce-kv
+                                                                     (fn [acc query style]
+                                                                       (assoc acc query {:pseudo {key style}}))
+                                                                     {}
+                                                                     media)]
+                                                             (enc/nested-merge acc m)))))
+                                                     {}
+                                                     pseudo)
+          pseudo-vals                              (reduce-kv
+                                                     (fn [acc key val]
+                                                       (assoc acc key (:style val)))
+                                                     {}
+                                                     pseudo)
+          comb-vals                                (reduce-kv
+                                                     (fn [acc key val]
+                                                       (assoc acc key (:style val)))
+                                                     {}
+                                                     combinators)]
+      (with-meta style {:media (enc/nested-merge media pseudo-media) :pseudo pseudo-vals :combinators comb-vals}))))
 
 (defn- create-style-function
   [{:keys [properties property scale transform default-scale]
