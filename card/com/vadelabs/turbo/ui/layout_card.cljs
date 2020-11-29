@@ -1,25 +1,34 @@
 (ns com.vadelabs.turbo.ui.layout-card
   (:require
    [devcards.core :as dc]
-   [com.vadelabs.turbo.dom :as dom :refer [defui]]
-   [com.vadelabs.turbo.styled :refer [<class]]
-   [com.vadelabs.turbo.ui.layout :as ui])
+   [com.vadelabs.turbo.components :as comp :refer [defui $ <>]]
+   [com.vadelabs.turbo.ui.layout :as ui]
+   [com.vadelabs.turbo.dom :as d])
   (:require-macros
    [devcards.core :refer [defcard]]))
 
 ;; (defui BasicBadgeUI
 ;;   []
-;;   [:& ui/Badge {} "Success"])
+;;   (ui/badge "Success"))
 ;; (defcard BasicBadge BasicBadgeUI)
+
+;; (defui Test
+;;   [props]
+;;   (<>
+;;     (d/div "HELLOE")
+;;     (d/div "WORKD")
+;;     ;; (ui/badge {:key "1" :mr "2"} "badge 1")
+;;     ;; (ui/badge {:key "2" :mr "2"} "badge 2"))
+;;     ))
+(defcard TEST (<> (d/div "HELLO")))
 
 ;; (defui SolidBadgeUI
 ;;   []
-;;   [:*
-;;    (for [color-scheme ["gray" "green" "red" "orange" "purple" "teal"]]
-;;      [:& ui/Badge {:key          color-scheme
-;;                    :color-scheme color-scheme
-;;                    :variant      "solid"
-;;                    :mr           "2"} color-scheme])])
+;;   (for [color-scheme ["gray" "green" "red" "orange" "purple" "teal"]]
+;;     (ui/badge {:key          color-scheme
+;;                :color-scheme color-scheme
+;;                :variant      "solid"
+;;                :mr           "2"} color-scheme)))
 
 ;; (defcard SolidBadge SolidBadgeUI)
 
@@ -39,24 +48,24 @@
 ;;      [:& ui/Badge {:key          color-scheme
 ;;                    :color-scheme color-scheme
 ;;                    :variant      "outline"
-;;                    :mr           "2"} color-scheme])])
+;;                    :mr          "2"} color-scheme])])
 
 ;; (defcard OutlineBadge OutlineBadgeUI)
 
-;; ;; BOX LAYOUT COMPONENT ;;
+;; BOX LAYOUT COMPONENT ;;
 ;; (defui BasicUI
 ;;   []
-;;   [:& ui/Box {}
-;;    [:& ui/Box {:color ["tomato" "purple"]
-;;                :hover {:bg    "red.500"
-;;                        :color "white"}
-;;                } "Welcome to Box"]
-;;    [:& ui/Box {:position "relative"
-;;                :bg       "red.200"
-;;                :before   {:height         0
-;;                           :content        "\"\""
-;;                           :display        "block"
-;;                           :padding-bottom ["40px" "100px"]}}]])
+;;   (ui/box
+;;     (ui/box {:color ["tomato" "purple"]
+;;              :hover {:bg    "red.500"
+;;                      :color "white"}}
+;;             "Welcome to box")
+;;     (ui/box {:position "relative"
+;;              :bg       "red.200"
+;;              :before   {:height         0
+;;                         :content        "\"\""
+;;                         :display        "block"
+;;                         :padding-bottom ["40px" "100px"]}})))
 ;; (defcard Basic BasicUI)
 
 ;; (defui SquareUI
@@ -236,28 +245,28 @@
 ;;      "Quidem, ipsam illum quis sed voluptatum quae eum fugit earum"]]])
 ;; (defcard UnstyledWithIcon UnstyledWithIconUI)
 
-(defui VerticalStackUI
-  []
-  [:& ui/Stack {:spacing "4"}
-   [:span "oooooo"]
-   [:span "ahhhh"]
-   [:span "Woah!"]])
-(defcard VerticalStack VerticalStackUI)
+;; (defui VerticalStackUI
+;;   []
+;;   [:& ui/Stack {:spacing "4"}
+;;    [:span "oooooo"]
+;;    [:span "ahhhh"]
+;;    [:span "Woah!"]])
+;; (defcard VerticalStack VerticalStackUI)
 
 
-(defui StackCustomDividerUI
-  []
-  [:div 
-   [:& ui/Stack {:spacing "12px"}
-    [:& ui/Box "1"]
-    [:& ui/Box "2"]
-    [:& ui/Box "3"]]
-   [:& ui/Stack {:spacing "40px"
-                 :divider (dom/html  [:& ui/Divider {:border-color "red.200" }])}
-    [:& ui/Box "1"]
-    [:& ui/Box "2"]
-    [:& ui/Box "3"]]]
-  )
-(defcard StackCustomDivider StackCustomDividerUI)
+;; (defui StackCustomDividerUI
+;;   []
+;;   [:div 
+;;    [:& ui/Stack {:spacing "12px"}
+;;     [:& ui/Box "1"]
+;;     [:& ui/Box "2"]
+;;     [:& ui/Box "3"]]
+;;    [:& ui/Stack {:spacing "40px"
+;;                  :divider (dom/html  [:& ui/Divider {:border-color "red.200" }])}
+;;     [:& ui/Box "1"]
+;;     [:& ui/Box "2"]
+;;     [:& ui/Box "3"]]]
+;;   )
+;; (defcard StackCustomDivider StackCustomDividerUI)
 
-;; (defcard COMPONENT component)
+;; ;; (defcard COMPONENT component)

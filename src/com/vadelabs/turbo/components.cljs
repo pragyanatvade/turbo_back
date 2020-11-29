@@ -6,7 +6,7 @@
    [taoensso.encore :as enc]
    [com.vadelabs.turbo.helpers :as th]
    [cljs-bean.core :as bean])
-  (:require-macros [com.vadelabs.turbo.elements]))
+  (:require-macros [com.vadelabs.turbo.components]))
 
 (def Fragment react/Frament)
 (def Suspense react/Suspense)

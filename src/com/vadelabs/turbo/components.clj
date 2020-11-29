@@ -3,8 +3,23 @@
   (:require
    [com.vadelabs.turbo.analyzer :as tana]))
 
-
 (defmacro $
+  "Create a new React element from a valid React type.
+  Will try to statically convert props to a JS object.
+  To pass in dynamic props, use the special `&` or `:&` key in the props map
+  to have the map merged in.
+  Simple example:
+  ($ my-component
+     \"child1\"
+     ($ \"span\"
+        {:style {:color \"green\"}}
+        \"child2\" ))
+  Dynamic exmaple:
+  (let [dynamic-props {:foo \"bar\"}]
+    ($ my-component
+       {:static \"prop\"
+        & dynamic-props}))
+  "
   [type & args]
   (when (and (symbol? (first args))
              (= (tana/inferred-type &env (first args))
@@ -23,20 +38,19 @@
                    (name type)
                    type)]
     (cond
-      (map? (first args)) `^js/React.Element (.createElement
-                                               (get-react)
-                                               ~type
-                                               ~(if native?
-                                                  `(com.vadelabs.turbo.helpers/native-props ~(first args))
-                                                  `(com.vadelabs.turbo.helpers/props ~(first args)))
-                                               ~@(rest args))
-      :else               `^js/React.Element (.createElement
-                                               (get-react)
-                                               ~type
-                                               nil
-                                               ~@args))))
+      (map? (first args))
+      `^js/React.Element (.createElement
+                           (get-react)
+                           ~type
+                           ~(if native?
+                              `(impl.props/native-props ~(first args))
+                              `(impl.props/props ~(first args)))
+                           ~@(rest args))
+
+      :else `^js/React.Element (.createElement (get-react) ~type nil ~@args))))
 
 (defmacro <>
+  "Creates a new React Fragment Element"
   [& children]
   `^js/React.Element ($ Fragment ~@children))
 
