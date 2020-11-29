@@ -1,10 +1,10 @@
 (ns com.vadelabs.turbo.ui.layout
-  (:refer-clojure :exclude [Box List])
+  (:refer-clojure :exclude [Box List list])
   (:require
    [com.vadelabs.turbo.components :as comp :refer [defui]]
    [com.vadelabs.turbo.ui.styled :as ui]
-   [com.vadelabs.turbo.ui.helpers :as tuh]))
-
+   [com.vadelabs.turbo.ui.helpers :as tuh]
+   [taoensso.encore :as enc]))
 
 (defui Box
   [props]
@@ -30,346 +30,355 @@
     (box props children)))
 (def badge (comp/factory Badge))
 
-;; (defui Square
-;;   [props]
-;;   (let [{:keys [children size center?]
-;;          :or   {center? true}} props
-;;         rest                   (dissoc props
-;;                                        :children
-;;                                        :size
-;;                                        :center?)
-;;         style-map              (if center?
-;;                                  {:display         "flex"
-;;                                   :align-items     "center"
-;;                                   :justify-content "center"}
-;;                                  {})
-;;         style-map              (assoc style-map
-;;                                       :flex-shrink 0
-;;                                       :flex-grow 0)
-;;         rest                   (assoc rest
-;;                                       :box-size size
-;;                                       :turbo$css style-map)]
-;;     [:& Box rest children]))
+(defui Square
+  [props]
+  (let [{:keys [children size center?]
+         :or   {center? true}} props
+        style-map              (if center?
+                                 {:display         "flex"
+                                  :align-items     "center"
+                                  :justify-content "center"}
+                                 {})
+        props                  (assoc props
+                                      :box-size size
+                                      :turbo$css (assoc style-map
+                                                        :flex-shrink 0
+                                                        :flex-grow 0))]
+    (box props children)))
+(def square (comp/factory Square))
 
-;; (defui Circle
-;;   [props]
-;;   (let [{:keys [size children]} props
-;;         rest                    (dissoc props :size children)
-;;         rest                    (assoc rest
-;;                                        :size size
-;;                                        :border-radius "9999px")]
-;;     [:& Square rest children]))
+(defui Circle
+  [props]
+  (let [{:keys [size children]} props
+        props                   (enc/assoc-some props
+                                                :size size
+                                                :border-radius "9999px")]
+    (square props children)))
+(def circle (comp/factory Circle))
 
-;; (defui Center
-;;   "Turbo component to horizontally and vertically center it's children"
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         style              {}
-;;         rest               (dissoc props :children)
-;;         rest               (assoc rest
-;;                                   :turbo$css (assoc style
-;;                                                     :display         "flex"
-;;                                                     :align-items     "center"
-;;                                                     :justify-content "center"))]
-;;     [:& Box rest children]))
+(defui Center
+  [props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :turbo$css {:display         "flex"
+                                              :align-items     "center"
+                                              :justify-content "center"})]
 
-;; (defui Code
-;;   "Turbo component to render inline code snippets"
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         style              (tuh/use-style-config :Code props)
-;;         rest               (dissoc props :children)
-;;         rest               (assoc rest
-;;                                   :turbo$css (assoc
-;;                                                style
-;;                                                :display "inline-block")
-;;                                   :as                "code")]
-;;     [:& Box rest children]))
+    (box props children)))
+(def center (comp/factory Center))
 
-;; (defn- transform
-;;   [props]
-;;   (reduce-kv
-;;     (fn [acc prop prop-value]
-;;       (if prop-value
-;;         (assoc acc prop (str "container." prop-value))
-;;         acc))
-;;     {}
-;;     props))
+(defui Code
+  [props]
+  (let [{:keys [children]} props
+        style              (tuh/use-style-config :Code props)
+        props              (assoc props
+                                  :turbo$css (assoc style
+                                                    :display "inline-block")
+                                  :as                "code")]
+    ;; [:& Box rest children]
+    (box props children)))
+(def code (comp/factory Code))
 
-;; (defui Container
-;;   "Turbo component to wrap app or website content
-;;    It sets `margin-left` and `margin-right` to `auto`
-;;    to keep it's content centered"
-;;   [props]
-;;   (let [{:keys [max-width width min-width
-;;                 w min-w max-w center? children]} props
-;;         rest                                     (dissoc props :max-width
-;;                                                          :width :min-width
-;;                                                          :w :min-w :max-w :center?
-;;                                                          :children)
-;;         width-props                              (transform {:max-w     max-w
-;;                                                              :max-width max-width
-;;                                                              :width     width
-;;                                                              :w         w
-;;                                                              :min-width min-width
-;;                                                              :min-w     min-w})
-;;         turbo-css                                {:w     "100%"
-;;                                                   :mx    "auto"
-;;                                                   :max-w "60ch"
-;;                                                   :px    "1rem"}
-;;         turbo-css                                (if center?
-;;                                                    (assoc turbo-css
-;;                                                           :display "flex"
-;;                                                           :flex-direction "column"
-;;                                                           :align-items "center")
-;;                                                    turbo-css)
-;;         rest                                     (assoc rest
-;;                                                         :turbo$css (enc/merge turbo-css width-props))]
-;;     [:& Box rest children]))
+(defn- transform
+  [props]
+  (reduce-kv
+    (fn [acc prop prop-value]
+      (if prop-value
+        (assoc acc prop (str "container." prop-value))
+        acc))
+    {}
+    props))
 
-;; (defui Divider
-;;   "Turbo layout component to visually separate content in a list or group.
-;;    It display a thin horizontal or vertical line, and renders a `hr` tag"
-;;   [props]
-;;   (let [{:keys [children orientation]
-;;          :or   {orientation "horizontal"}} props
-;;         style                              (tuh/use-style-config :Divider props)
-;;         {:keys [border-left-width
-;;                 border-right-width
-;;                 border-width
-;;                 border-bottom-width
-;;                 border-top-width]}         style
+(defui Container
+  [props]
+  (let [{:keys [max-width width min-width
+                w min-w max-w center? children]} props
+        width-props                              (transform {:max-w     max-w
+                                                             :max-width max-width
+                                                             :width     width
+                                                             :w         w
+                                                             :min-width min-width
+                                                             :min-w     min-w})
+        turbo-css                                {:w     "100%"
+                                                  :mx    "auto"
+                                                  :max-w "60ch"
+                                                  :px    "1rem"}
+        turbo-css                                (if center?
+                                                   (assoc turbo-css
+                                                          :display "flex"
+                                                          :flex-direction "column"
+                                                          :align-items "center")
+                                                   turbo-css)
+        props                                    (assoc props
+                                                        :turbo$css (enc/merge turbo-css width-props))]
+    (box props children)))
+(def container (comp/factory Container))
 
-;;         divider-styles {:vertical   {:border-left-width (or border-left-width border-right-width border-width "1px")
-;;                                      :height            "100%"}
-;;                         :horizontal {:border-bottom-width (or border-bottom-width border-top-width border-width "1px")
-;;                                      :width               "100px"}}
-;;         divider-style  ((keyword orientation) divider-styles)
-;;         turbo-css      (enc/merge style divider-style)
-;;         rest           (dissoc props :children :orientation)
-;;         rest           (assoc rest
-;;                               :turbo$css turbo-css
-;;                               :role "separator"
-;;                               :aria-orientation orientation
-;;                               :as :hr)]
-;;     [:& Box rest children]))
+(defui Divider
+  [props]
+  (let [{:keys [children orientation]
+         :or   {orientation "horizontal"}} props
+        style                              (tuh/use-style-config :Divider props)
+        {:keys [border-left-width
+                border-right-width
+                border-width
+                border-bottom-width
+                border-top-width]}         style
 
-;; (defui Flex
-;;   "Turbo component used to create flexbox layouts. It renders a `div`
-;;    with `display: flex` and comes with helpful style shorthand."
-;;   [props]
-;;   (let [{:keys [direction align
-;;                 justify wrap
-;;                 basis grow
-;;                 shrink children]} props
-;;         props                     (assoc props
-;;                                          :turbo$css {:display         "flex"
-;;                                                      :flex-direction  direction
-;;                                                      :align-items     align
-;;                                                      :justify-content justify
-;;                                                      :flex-wrap       wrap
-;;                                                      :flex-basis      basis
-;;                                                      :flex-grow       grow
-;;                                                      :flex-shrink     shrink})]
-;;     [:& Box props children]))
+        divider-styles {:vertical   {:border-left-width (or border-left-width border-right-width border-width "1px")
+                                     :height            "100%"}
+                        :horizontal {:border-bottom-width (or border-bottom-width border-top-width border-width "1px")
+                                     :width               "100px"}}
+        divider-style  ((keyword orientation) divider-styles)
+        turbo-css      (enc/merge style divider-style)
+        props          (assoc props
+                              :turbo$css turbo-css
+                              :role "separator"
+                              :aria-orientation orientation
+                              :as "hr")]
+    (box props children)))
+(def divider (comp/factory Divider))
 
-;; (defui Grid
-;;   "Turbo layout component to create grid layouts.
-;;    It renders `div` with `display: grid` and comes
-;;    with helpful style shorthand."
-;;   [props]
-;;   (let [{:keys [area template-areas gap row-gap
-;;                 column-gap column row auto-flow
-;;                 auto-rows template-rows auto-columns
-;;                 template-columns children]} props
-;;         props                               (assoc props
-;;                                                    :turbo$css {:display               "grid"
-;;                                                                :grid-area             area
-;;                                                                :grid-template-areas   template-areas
-;;                                                                :grid-gap              gap
-;;                                                                :grid-row-gap          row-gap
-;;                                                                :grid-column-gap       column-gap
-;;                                                                :grid-auto-columns     auto-columns
-;;                                                                :grid-column           column
-;;                                                                :grid-row              row
-;;                                                                :grid-auto-flow        auto-flow
-;;                                                                :grid-auto-rows        auto-rows
-;;                                                                :grid-template-rows    template-rows
-;;                                                                :grid-template-columns template-columns})]
-;;     [:& Box props children]))
+(defui Flex
+  [props]
+  (let [{:keys [direction align
+                justify wrap
+                basis grow
+                shrink children]} props
+        props                     (assoc props
+                                         :turbo$css (enc/assoc-some
+                                                      {:display "flex"}
+                                                      :flex-direction  direction
+                                                      :align-items     align
+                                                      :justify-content justify
+                                                      :flex-wrap       wrap
+                                                      :flex-basis      basis
+                                                      :flex-grow       grow
+                                                      :flex-shrink     shrink))]
+    (box props children)))
+(def flex (comp/factory Flex))
 
-;; (defn- span-fn
-;;   [span?]
-;;   (cond
-;;     (vector? span?) (into [] (map (fn [item]
-;;                                     (if (= item "auto")
-;;                                       "auto"
-;;                                       (str "span " item "/span " item))) span?))
-;;     (map? span?)    (reduce-kv
-;;                       (fn [acc key val]
-;;                         (if (= val "auto")
-;;                           (assoc acc key "auto")
-;;                           (assoc acc key (str " span " val "/span " val))))
-;;                       {}
-;;                       span?)
-;;     (nil? span?)    span?
-;;     :else           (str "span " span? "/span " span?)))
+(defui Grid
+  [props]
+  (let [{:keys [area template-areas gap row-gap
+                column-gap column row auto-flow
+                auto-rows template-rows auto-columns
+                template-columns children]} props
+        props                               (assoc
+                                              props
+                                              :turbo$css
+                                              (enc/assoc-some
+                                                {:display "grid"}
+                                                :grid-area             area
+                                                :grid-template-areas   template-areas
+                                                :grid-gap              gap
+                                                :grid-row-gap          row-gap
+                                                :grid-column-gap       column-gap
+                                                :grid-auto-columns     auto-columns
+                                                :grid-column           column
+                                                :grid-row              row
+                                                :grid-auto-flow        auto-flow
+                                                :grid-auto-rows        auto-rows
+                                                :grid-template-rows    template-rows
+                                                :grid-template-columns template-columns))]
+    ;; [:& Box props children]
+    (box props children)
+    ))
+(def grid (comp/factory Grid))
 
-;; (defui GridItem
-;;   [props]
-;;   (let [{:keys [col-span col-start col-end
-;;                 row-end row-span row-start
-;;                 children]} props
-;;         props              (assoc props
-;;                                   :turbo$css {:grid-column       (span-fn col-span)
-;;                                               :grid-row          (span-fn  row-span)
-;;                                               :grid-column-start col-start
-;;                                               :grid-column-end   col-end
-;;                                               :grid-row-start    row-start
-;;                                               :grid-row-end      row-end})]
-;;     [:& Box props children]))
+(defn- span-fn
+  [span?]
+  (cond
+    (vector? span?) (into [] (map (fn [item]
+                                    (if (= item "auto")
+                                      "auto"
+                                      (str "span " item "/span " item))) span?))
+    (map? span?)    (reduce-kv
+                      (fn [acc key val]
+                        (if (= val "auto")
+                          (assoc acc key "auto")
+                          (assoc acc key (str " span " val "/span " val))))
+                      {}
+                      span?)
+    (nil? span?)    span?
+    :else           (str "span " span? "/span " span?)))
 
-;; (defui Heading
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         style              (tuh/use-style-config :Heading props)
-;;         rest               (dissoc props :children)
-;;         rest               (assoc rest
-;;                                   :turbo$css style
-;;                                   :as :h2)]
-;;     [:& Box rest children]))
+(defui GridItem
+  [props]
+  (let [{:keys [col-span col-start col-end
+                row-end row-span row-start
+                children]} props
+        props              (assoc props
+                                  :turbo$css
+                                  (enc/assoc-some
+                                    {}
+                                    :grid-column       (span-fn col-span)
+                                    :grid-row          (span-fn  row-span)
+                                    :grid-column-start col-start
+                                    :grid-column-end   col-end
+                                    :grid-row-start    row-start
+                                    :grid-row-end      row-end))]
+    (box props children)))
+(def grid-item (comp/factory GridItem))
 
-;; (defui Kbd
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         style              (tuh/use-style-config :Kbd props)
-;;         rest               (dissoc props :children)
-;;         rest               (assoc rest
-;;                                   :turbo$css (assoc style
-;;                                                     :font-family "mono")
-;;                                   :as                :kbd)]
-;;     [:& Box rest children]))
+(defui Heading
+  [props]
+  (let [{:keys [children]} props
+        style              (tuh/use-style-config :Heading props)
+        props              (assoc props
+                                  :turbo$css style
+                                  :as "h2")]
+    (box props children)))
+(def heading (comp/factory Heading))
 
-;; (defui LinkOverlay
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         rest               (dissoc props :children)
-;;         rest               (assoc rest
-;;                                   :turbo$css {:position "static"
-;;                                               :_before  {:content  "''"
-;;                                                          :cursor   "inherit"
-;;                                                          :display  "block"
-;;                                                          :position "absolute"
-;;                                                          :top      "0"
-;;                                                          :left     "0"
-;;                                                          :width    "100%"
-;;                                                          :height   "100%"}}
-;;                                   :as :a)]
-;;     [:& Box rest children]))
+(defui Kbd
+  [props]
+  (let [{:keys [children]} props
+        style              (tuh/use-style-config :Kbd props)
+        props              (assoc props
+                                  :turbo$css (assoc style
+                                                    :font-family "mono")
+                                  :as                "kbd")]
+    (box props children)))
+(def kbd (comp/factory Kbd))
 
-;; (defui LinkBox
-;;   [props]
-;;   (let [{:keys [children href external?]} props
-;;         props                             (assoc props
-;;                                                  :turbo$css {:pos "relative"})]
-;;     [:& Box props children
-;;      [:& LinkOverlay {:href   href
-;;                       :target (when external? "_blank")
-;;                       :rel    (when external? "noopener noreferrer")}]]))
+(defui LinkOverlay
+  [props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :turbo$css {:position "static"
+                                              :pseudo   {:before {:content  "''"
+                                                                  :cursor   "inherit"
+                                                                  :display  "block"
+                                                                  :position "absolute"
+                                                                  :top      "0"
+                                                                  :left     "0"
+                                                                  :width    "100%"
+                                                                  :height   "100%"}}}
+                                  :as "a")]
+    (box props children)))
+(def link-overlay (comp/factory LinkOverlay))
 
-;; (defui Link
-;;   [props]
-;;   (let [{:keys [children external?]} props
-;;         style                        (tuh/use-style-config :Link props)
-;;         props                        (assoc props
-;;                                             :turbo$css style
-;;                                             :target (when external? "_blank")
-;;                                             :rel (when external? "noopener noreferrer")
-;;                                             :as :a)]
-;;     [:& Box props children]))
+(defui LinkBox
+  [props]
+  (let [{:keys [children href external?]} props
+        props                             (assoc props
+                                                 :turbo$css {:pos "relative"})
+        target                            (when external? "_blank")
+        rel                               (when external? "noopener noreferrer")
+        link-overlay-props                (enc/assoc-some
+                                            {}
+                                            :href href
+                                            :target target
+                                            :rel rel)]
+    (box props
+         (link-overlay link-overlay-props children))
+    ;; [:& Box props children
+    ;;  [:& LinkOverlay {:href   href
+    ;;                   :target (when external? "_blank")
+    ;;                   :rel    (when external? "noopener noreferrer")}]]
+    ))
+(def link-box (comp/factory LinkBox))
 
-;; (defui List
-;;   [props]
-;;   (let [{:keys [as children style-type style-position spacing]
-;;          :or   {style-type "none"}} props
-;;         props                       (assoc props
-;;                                            :list-style-type style-type
-;;                                            :list-style-position style-position
-;;                                            :role "list"
-;;                                            :turbo$css (if spacing {} {}) ;; TODO
-;;                                            :as (or as :ul))]
-;;     [:& Box props children]))
+(defui Link
+  [props]
+  (let [{:keys [children external?]} props
+        style                        (tuh/use-style-config :Link props)
+        props                        (enc/assoc-some props
+                                                     :turbo$css style
+                                                     :target (when external? "_blank")
+                                                     :rel (when external? "noopener noreferrer")
+                                                     :as "a")]
+    (box props children)))
+(def link (comp/factory Link))
 
-;; (defui OrderedList
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         props              (assoc props
-;;                                   :style-type "decimal"
-;;                                   :margin-left "1em"
-;;                                   :as :ol)]
-;;     [:& List props children]))
+(defui List
+  [props]
+  (let [{:keys [as children style-type style-position spacing]
+         :or   {style-type "none"}} props
+        props                       (enc/assoc-some props
+                                                    :list-style-type style-type
+                                                    :list-style-position style-position
+                                                    :role "list"
+                                                    :turbo$css (if spacing {} {}) ;; TODO
+                                                    :as (or as "ul"))]
+    (box props children)))
+(def list (comp/factory List))
 
-;; (defui UnorderedList
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         props              (assoc props
-;;                                   :style-type "initial"
-;;                                   :margin-left "1em"
-;;                                   :as :ul)]
-;;     [:& List props children]))
+(defui OrderedList
+  [props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :style-type "decimal"
+                                  :margin-left "1em"
+                                  :as "ol")]
+    (list props children)))
+(def ordered-list (comp/factory OrderedList))
 
-;; (defui ListItem
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         props              (assoc props
-;;                                   :as :li)]
-;;     [:& Box props children]))
+(defui UnorderedList
+  [props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :style-type "initial"
+                                  :margin-left "1em"
+                                  :as "ul")]
+    (list props children)))
+(def unordered-list (comp/factory UnorderedList))
 
-;; (defui ListIcon
-;;   [props]
-;;   (let [{:keys [children]} props]
-;;     [:& Box props children]))
+(defui ListItem
+  [props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :as "li")]
+    (box props children)))
+(def list-item (comp/factory ListItem))
 
+(defui ListIcon
+  [props]
+  (let [{:keys [children]} props]
+    (box props children)))
+(def list-icon (comp/factory ListIcon))
 
-;; (defn- width-to-columns
-;;   [count]
-;;   (if (vector? count)
-;;     (into [] (map (fn [item]
-;;                     (if (nil? item)
-;;                       nil
-;;                       (str "repeat(auto-fit, minmax(" item ", 1fr)")))
-;;                   count))
-;;     (str "repeat(auto-fit, minmax(" count ", 1fr))")))
+(defn- width-to-columns
+  [count]
+  (if (vector? count)
+    (into [] (map (fn [item]
+                    (if (nil? item)
+                      nil
+                      (str "repeat(auto-fit, minmax(" item ", 1fr)")))
+                  count))
+    (str "repeat(auto-fit, minmax(" count ", 1fr))")))
 
-;; (defn- count-to-columns
-;;   [count]
-;;   (cond
-;;     (vector? count) (into [] (map (fn [item]
-;;                                     (if (nil? item)
-;;                                       nil
-;;                                       (str "repeat(" item ", 1fr)"))) count))
-;;     (map? count)    (reduce-kv
-;;                       (fn [acc key val]
-;;                         (if (nil? val)
-;;                           acc
-;;                           (assoc acc key (str "repeat(" val ", 1fr)"))))
-;;                       {}
-;;                       count)
-;;     :else           (str "repeat(" count ", 1fr)")))
+(defn- count-to-columns
+  [count]
+  (cond
+    (vector? count) (into [] (map (fn [item]
+                                    (if (nil? item)
+                                      nil
+                                      (str "repeat(" item ", 1fr)"))) count))
+    (map? count)    (reduce-kv
+                      (fn [acc key val]
+                        (if (nil? val)
+                          acc
+                          (assoc acc key (str "repeat(" val ", 1fr)"))))
+                      {}
+                      count)
+    :else           (str "repeat(" count ", 1fr)")))
 
-;; (defui SimpleGrid
-;;   [props]
-;;   (let [{:keys [children columns spacing-x spacing-y
-;;                 spacing min-child-width]} props
-;;         template-columns                  (if min-child-width
-;;                                             (width-to-columns min-child-width)
-;;                                             (count-to-columns columns))
-;;         props                             (assoc props
-;;                                                  :gap spacing
-;;                                                  :column-gap spacing-x
-;;                                                  :row-gap spacing-y
-;;                                                  :template-columns template-columns)]
-;;     [:& Grid props children]))
+(defui SimpleGrid
+  [props]
+  (let [{:keys [children columns spacing-x spacing-y
+                spacing min-child-width]} props
+        template-columns                  (if min-child-width
+                                            (width-to-columns min-child-width)
+                                            (count-to-columns columns))
+        props                             (enc/assoc-some props
+                                                          :gap spacing
+                                                          :column-gap spacing-x
+                                                          :row-gap spacing-y
+                                                          :template-columns template-columns)]
+    (grid props children)))
+(def simple-grid (comp/factory SimpleGrid))
 
 ;; (defui Spacer
 ;; "A flexible flex spacer that expands along the major axis of its containing
@@ -467,18 +476,17 @@
 ;;                                 :direction "column")]
 ;;   [:& Stack props children]))
 
-;; (defui Text
-;; [props]
-;; (let [{:keys [children align decoration casing]} props
-;;       rest                                       (dissoc props :children
-;;                                                          :align :decoration
-;;                                                          :casing)
-;;       rest                                       (assoc rest
-;;                                                         :text-align align
-;;                                                         :text-decoration decoration
-;;                                                         :text-transform casing
-;;                                                         :as :p)]
-;;   [:& Box rest children]))
+(defui Text
+  [props]
+  (let [{:keys [children align decoration casing]} props
+        props                                      (enc/assoc-some
+                                                     props
+                                                     :text-align align
+                                                     :text-decoration decoration
+                                                     :text-transform casing
+                                                     :as "p")]
+    (box props children)))
+(def text (comp/factory Text))
 
 ;; (defui Wrap
 ;; [props]

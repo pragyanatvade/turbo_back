@@ -81,7 +81,7 @@
    (let [props        (enc/merge (:turbo$css props)
                                  props)
          style-props  (filter-props props style-keys)
-         pseudo-props (filter-props props pseudo-keys)
+         pseudo-props (:pseudo props) ;;(filter-props props pseudo-keys)
          comb-props   (:combinators props)
          style        (reduce-kv
                         (fn [acc key val]

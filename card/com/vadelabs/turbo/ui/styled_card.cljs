@@ -9,9 +9,8 @@
 
 (defui BlockUI
   []
-  (ui/block {} "BLOCK TEST"))
+  (ui/block {} "HELLO WORLD"))
 
-(defcard BlockCard
-  ($ BlockUI))
+(defcard BlockCard BlockUI)
 
 

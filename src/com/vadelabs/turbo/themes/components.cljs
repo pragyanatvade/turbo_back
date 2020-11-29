@@ -98,8 +98,8 @@
           :text-decoration "none"
           :outline         "none"
           :color           "inherit"
-          :hover           {:text-decoration "underline"}
-          :focus           {:box-shadow "outline"}}})
+          :pseudo          {:hover {:text-decoration "underline"}
+                            :focus {:box-shadow "outline"}}}})
 
 (def components
   {:Badge   Badge

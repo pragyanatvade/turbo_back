@@ -8,7 +8,7 @@
    [cljs-bean.core :as bean])
   (:require-macros [com.vadelabs.turbo.components]))
 
-(def Fragment react/Frament)
+(def Fragment react/Fragment)
 (def Suspense react/Suspense)
 (def create-element react/createElement)
 (def create-context react/createContext)
@@ -51,6 +51,24 @@
   [type]
   (-> (fn factory [& args]
         (apply $ type args))
+      (specify! IExtractType
+        (-type [_] type))))
+
+(defn cljs-factory
+  [type]
+  (-> (fn factory [& args]
+        (if (map? (first args))
+          (let [props (first args)]
+            (apply react/createElement
+                   type
+                   #js {"turbo$props" (dissoc props :key :ref)
+                        "key"         (get props :key js/undefined)
+                        "ref"         (get props :ref js/undefined)}
+                   (rest args)))
+          (apply react/createElement
+                 type
+                 #js {}
+                 args)))
       (specify! IExtractType
         (-type [_] type))))
 

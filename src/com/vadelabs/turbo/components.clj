@@ -4,22 +4,6 @@
    [com.vadelabs.turbo.analyzer :as tana]))
 
 (defmacro $
-  "Create a new React element from a valid React type.
-  Will try to statically convert props to a JS object.
-  To pass in dynamic props, use the special `&` or `:&` key in the props map
-  to have the map merged in.
-  Simple example:
-  ($ my-component
-     \"child1\"
-     ($ \"span\"
-        {:style {:color \"green\"}}
-        \"child2\" ))
-  Dynamic exmaple:
-  (let [dynamic-props {:foo \"bar\"}]
-    ($ my-component
-       {:static \"prop\"
-        & dynamic-props}))
-  "
   [type & args]
   (when (and (symbol? (first args))
              (= (tana/inferred-type &env (first args))
@@ -43,8 +27,8 @@
                            (get-react)
                            ~type
                            ~(if native?
-                              `(impl.props/native-props ~(first args))
-                              `(impl.props/props ~(first args)))
+                              `(com.vadelabs.turbo.helpers/native-props ~(first args))
+                              `(com.vadelabs.turbo.helpers/props ~(first args)))
                            ~@(rest args))
 
       :else `^js/React.Element (.createElement (get-react) ~type nil ~@args))))
@@ -65,32 +49,38 @@
 
 (defmacro defui
   [display-name & form-body]
-  (let [docstring       (when (string? (first form-body))
-                          (first form-body))
-        props-bindings  (if (nil? docstring)
-                          (first form-body)
-                          (second (form-body)))
-        body            (if (nil? docstring)
-                          (rest form-body)
-                          (rest (rest form-body)))
-        wrapped-name    (symbol (str display-name "-turbo-render"))
-        opts-map?       (map? (first body))
-        opts            (if opts-map?
-                          (first body)
-                          {})
-        sig-sym         (gensym "sig")
-        fqname          (str *ns* "/" display-name)
-        body            (cond-> body
-                          opts-map? (rest))
-        element-fn-name display-name]
+  (let [docstring         (when (string? (first form-body))
+                            (first form-body))
+        props-bindings    (if (nil? docstring)
+                            (first form-body)
+                            (second (form-body)))
+        body              (if (nil? docstring)
+                            (rest form-body)
+                            (rest (rest form-body)))
+        wrapped-name      (symbol (str display-name "-turbo-render"))
+        opts-map?         (map? (first body))
+        opts              (if opts-map?
+                            (first body)
+                            {})
+        sig-sym           (gensym "sig")
+        fqname            (str *ns* "/" display-name)
+        body              (cond-> body
+                            opts-map? (rest))
+        ;; component-fn-name (with-meta (symbol (str display-name "-render-type"))
+        ;;                     {:private true})
+        component-fn-name display-name
+        ]
     `(do
        (def ~(vary-meta
-               element-fn-name
+               component-fn-name
                assoc
-               :turbo$element? true)
+               :turbo$component? true)
          ~@(when-not (nil? docstring)
              (list docstring))
-         (-> ~(defui* element-fn-name props-bindings body)
+         (-> ~(defui* component-fn-name props-bindings body)
              (cond->
-                 (true? ^boolean goog/DEBUG) (doto (goog.object/set "displayName" ~fqname))))))))
+                 (true? ^boolean goog/DEBUG) (doto (goog.object/set "displayName" ~fqname)))))
+       ;; (def ~display-name
+       ;;   (cljs-factory ~(symbol (str display-name "-render-type"))))
+       )))
 
