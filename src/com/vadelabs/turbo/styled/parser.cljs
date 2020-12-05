@@ -46,7 +46,7 @@
    :border-style               {:property :border-style
                                 :scale    :border-styles}
    :border-color               {:property :border-color
-                                :scale    :border-colors}
+                                :scale    :colors}
    :border-radius              {:property :border-radius
                                 :scale    :radius}
    :border-top                 {:property :border-top

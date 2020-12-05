@@ -36,6 +36,7 @@
 (defmacro <>
   "Creates a new React Fragment Element"
   [& children]
+  (println "CHILDREN" children)
   `^js/React.Element ($ Fragment ~@children))
 
 (defn defui*

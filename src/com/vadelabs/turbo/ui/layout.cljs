@@ -1,7 +1,7 @@
 (ns com.vadelabs.turbo.ui.layout
   (:refer-clojure :exclude [Box List list])
   (:require
-   [com.vadelabs.turbo.components :as comp :refer [defui]]
+   [com.vadelabs.turbo.components :as comp :refer [defui <> $]]
    [com.vadelabs.turbo.ui.styled :as ui]
    [com.vadelabs.turbo.ui.helpers :as tuh]
    [taoensso.encore :as enc]))
@@ -128,7 +128,7 @@
         divider-styles {:vertical   {:border-left-width (or border-left-width border-right-width border-width "1px")
                                      :height            "100%"}
                         :horizontal {:border-bottom-width (or border-bottom-width border-top-width border-width "1px")
-                                     :width               "100px"}}
+                                     :width               "100%"}}
         divider-style  ((keyword orientation) divider-styles)
         turbo-css      (enc/merge style divider-style)
         props          (assoc props
@@ -181,9 +181,7 @@
                                                 :grid-auto-rows        auto-rows
                                                 :grid-template-rows    template-rows
                                                 :grid-template-columns template-columns))]
-    ;; [:& Box props children]
-    (box props children)
-    ))
+    (box props children)))
 (def grid (comp/factory Grid))
 
 (defn- span-fn
@@ -380,101 +378,127 @@
     (grid props children)))
 (def simple-grid (comp/factory SimpleGrid))
 
-;; (defui Spacer
-;; "A flexible flex spacer that expands along the major axis of its containing
-;;    flex layout. It renders `dev` by default, and takes up any available space."
-;; [props]
-;;   (let [{:keys [children]} props
-;;         rest               (dissoc props :children)
-;;         rest               (assoc rest
-;;                                   :turbo$css {:flex         1
-;;                                               :justify-self "stretch"
-;;                                               :align-self   "stretch"})]
-;;   [:& Box rest children]))
+(defui Spacer
+  [props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :turbo$css {:flex         1
+                                              :justify-self "stretch"
+                                              :align-self   "stretch"})]
+    (box props children)))
+(def spacer (comp/factory Spacer))
 
-;; (defui StackDivider
-;;   [props]
-;;   (let [{:keys [children turbo$css]} props
-;;         props                        (assoc props
-;;                                             :turbo$css turbo$css
-;;                                             :border-width 0
-;;                                             :align-self "stretch"
-;;                                             :border-color "inherit"
-;;                                             :width "auto"
-;;                                             :height "auto")]
-;;     [:& Box props children]))
+(defui StackDivider
+  [props]
+  (let [{:keys [children]} props
+        turbo$css          {:border-width "0"
+                            :align-self   "stretch"
+                            :border-color "inherit"
+                            :width        "auto"
+                            :height       "auto"}
+        props              (enc/assoc-some
+                             props
+                             :turbo$css turbo$css)]
+    (box props children)))
+(def stack-divider (comp/factory StackDivider))
 
-;; (defui StackItem
-;;   [props]
-;;   (let [{:keys [children turbo$css]} props
-;;         rest                         (dissoc props :children :turbo$css)
-;;         rest                         (assoc rest
-;;                                             :turbo$css turbo$css
-;;                                             :display "inline-block"
-;;                                             :flex "0 0 auto"
-;;                                             :min-width 0)]
-;;     [:& Box rest children]))
+(defui StackItem
+  [props]
+  (let [{:keys [children turbo$css]} props
+        props                        (enc/assoc-some props
+                                                     :turbo$css turbo$css
+                                                     :display "inline-block"
+                                                     :flex "0 0 auto"
+                                                     :min-width 0)]
+    (box props children)))
+(def stack-item (comp/factory StackItem))
+
+(defn- get-stack-styles
+  [direction spacing]
+  (let [styles {:column         {:mt spacing :ml "0"}
+                :row            {:ml spacing :mt "0"}
+                :column-reverse {:mb spacing :mr "0"}
+                :row-reverse    {:mr spacing :mb "0"}}
+        value  (cond
+                 (vector? direction) (into []
+                                           (map (fn [item]
+                                                  (get styles (keyword item)))
+                                                direction))
+                 :else               [(get styles (keyword direction))])]
+    {:combinators {">*:not(style) ~*:not(style)" value}}))
+
+(defn- get-divider-styles
+  [direction spacing]
+  (let [styles {:column         {:my spacing :mx "0" :border-left-width "0" :border-bottom-width "1px"}
+                :row            {:mx spacing :my "0" :border-left-width "1px" :border-bottom-width "0"}
+                :column-reverse {:my spacing :mx "0" :border-left-width "0" :border-bottom-width "1px"}
+                :row-reverse    {:mx spacing :my "0" :border-left-width "1px" :border-bottom-width "0"}}
+        value  (cond
+                 (vector? direction) (into []
+                                           (map (fn [item]
+                                                  (get styles (keyword item)))
+                                                direction))
+                 :else               [(get styles (keyword direction))])]
+    {:combinators {"&" value}}))
 
 
-;; (defn- get-stack-styles
-;;   [direction spacing]
-;;   (let [styles {:column         {:mt spacing :ml "0"}
-;;                 :row            {:ml spacing :mt "0"}
-;;                 :column-reverse {:mb spacing :mr "0"}
-;;                 :row-reverse    {:mr spacing :mb "0"}}]
-;;     {:combinators {[:> "*:not(style)"] (get styles (keyword direction))
-;;                    [:- "*:not(style)"] (get styles (keyword direction))}}))
+(defui Stack
+  [props]
+  (let [{:keys [children inline? direction align justify
+                spacing wrap divider]
+         :or   {spacing "0.5rem"}} props
+        direction                  (if inline?
+                                     "row"
+                                     (or direction "column"))
+        styles                     (get-stack-styles direction spacing)
+        divider-styles             (get-divider-styles direction spacing)
+        divider                    (if (map? divider)
+                                     (stack-divider (enc/merge divider-styles divider))
+                                     divider)
+        divider?                   (not (nil? divider))
+        use-children?              (nil? divider)
+        clones                     (if use-children?
+                                     children
+                                     (loop [children   children
+                                            idx        0
+                                            result     []
+                                            last-child (last children)]
+                                       (if (empty? children)
+                                         result
+                                         (let [child    (first children)
+                                               fragment (<> {:key idx}
+                                                            child
+                                                            (when-not (= child last-child)
+                                                              divider))]
+                                           (recur (rest children) (inc idx) (conj result fragment) last-child)))))
+        props                      (enc/assoc-some props
+                                                   :turbo$css (when-not divider? styles)
+                                                   :display "flex"
+                                                   :align-items align
+                                                   :justify-content justify
+                                                   :flex-direction direction
+                                                   :flex-wrap wrap)
+        ]
+    (box props clones)))
+(def stack (comp/factory Stack))
 
-;; (defn- get-divider-styles
-;;   [direction spacing]
-;;   (let [styles {:column         {:my spacing :mx "0" :border-left-width "0" :border-bottom-width "1px"}
-;;                 :row            {:mx spacing :my "0" :border-left-width "1px" :border-bottom-width "0"}
-;;                 :column-reverse {:my spacing :mx "0" :border-left-width "0" :border-bottom-width "1px"}
-;;                 :row-reverse    {:mx spacing :my "0" :border-left-width "1px" :border-bottom-width "0"}}]
-;;     {:& (direction styles)}))
+(defui HStack
+  [props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :align "center"
+                                  :direction "row")]
+    (stack props children)))
+(def h-stack (comp/factory HStack))
 
-
-
-;; (defui Stack
-;;   [props]
-;;   (let [{:keys [children inline? direction align justify
-;;                 spacing wrap divider]
-;;          :or   {spacing "0.5rem"}} props
-;;         direction                  (if inline?
-;;                                      "row"
-;;                                      (or direction "column"))
-;;         styles                     (get-stack-styles direction spacing)
-;;         divider?                   (not (nil? divider))
-;;         use-children?              (nil? divider)
-;;         clones                     (if use-children?
-;;                                      children
-;;                                      divider)
-;;         props                      (assoc props
-;;                                           :turbo$css (if divider?
-;;                                                        {}
-;;                                                        styles)
-;;                                           :display "flex"
-;;                                           :align-items align
-;;                                           :justify-content justify
-;;                                           :flex-direction direction
-;;                                           :flex-wrap wrap)]
-;;     [:& Box props clones]))
-
-;; (defui HStack
-;; [props]
-;;   (let [{:keys [children]} props
-;;         props              (assoc props
-;;                                   :align "center"
-;;                                   :direction "row")]
-;;   [:& Stack props children]))
-
-;; (defui VStack
-;; [props]
-;; (let [{:keys [children]} props
-;;       props              (assoc props
-;;                                 :align "center"
-;;                                 :direction "column")]
-;;   [:& Stack props children]))
+(defui VStack
+  [props]
+  (let [{:keys [children]} props
+        props              (assoc props
+                                  :align "center"
+                                  :direction "column")]
+    (stack props children)))
+(def v-stack (comp/factory VStack))
 
 (defui Text
   [props]
