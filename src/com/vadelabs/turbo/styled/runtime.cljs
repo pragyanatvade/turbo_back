@@ -69,6 +69,7 @@
                                               :elements   elements
                                               :style      style}))))
                          combinators)]])
+        _       (println "RENDER" style)
         css-str (css {:vendors       (seq (:vendors @options))
                       :pretty-print? dev?
                       :auto-prefix   (seq (:auto-prefix @options))}

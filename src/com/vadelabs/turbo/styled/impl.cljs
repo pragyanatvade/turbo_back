@@ -2,7 +2,8 @@
   (:require
    [clojure.string :as str]
    [com.vadelabs.turbo.styled.runtime :as runtime]
-   [garden.stylesheet :refer [at-media at-supports]]))
+   [garden.stylesheet :refer [at-media at-supports]]
+   [garden.selectors :as s]))
 
 (def dev? ^boolean js/goog.DEBUG)
 
@@ -15,15 +16,38 @@
       [(keyword (str "&" kw)) p])
     pseudos))
 
+
+(def combinator-fns
+  {:>           s/>
+   :+           s/+
+   :-           s/-
+   :descendant  s/descendant
+   :last-child  s/last-child
+   :first-child s/first-child})
+
+;; [(map (fn [[[combinator & elements] style]]
+;;         (if-let [cfn (get combinator-fns combinator)]
+;;           [(apply cfn classname elements) style]
+;;           (throw (ex-info "Unsupported combinator function "
+;;                           {:combinator combinator
+;;                            :elements   elements
+;;                            :style      style}))))
+;;       combinators)]
+
 (defn- convert-media
-  [media]
-  (map (fn [[query style]]
-         (let [pseudo (-> style
-                          ;;(meta)
-                          :pseudo
-                          (convert-pseudo))]
-           (at-media query (into [:& style] pseudo))))
-       media))
+  ([media]
+   (convert-media media nil))
+  ([media classname]
+   (map (fn [[query style]]
+          (let [pseudo (-> style
+                           ;;(meta)
+                           :pseudo
+                           (convert-pseudo))
+                comb   (-> style
+                           :combinators)
+                style  (dissoc style :combinators)]
+            (at-media query (into [:& style] pseudo))))
+        media)))
 
 (defn- convert-supports
   [supports]

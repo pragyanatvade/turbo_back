@@ -15,15 +15,23 @@
                                          :preloads   []}}
             :cards   {:target           :browser
                       :output-dir       "resources/public/js/cards"
-                      :asset-path       "/js"
-                      :modules          {:main {:init-fn com.vadelabs.turbo-card/init}}
-                      :compiler-options {:devcards true}
+                      :asset-path       "/js/cards"
+                      :modules          {:shared {}
+                                         :main   {:init-fn    com.vadelabs.turbo-card/init
+                                                  :entries    [com.vadelabs.turbo-card]
+                                                  :depends-on #{:shared}}}
+                      :compiler-options {:devcards           true
+                                         :output-feature-set :es8}
                       :build-options    {:ns-aliases {devcards-marked             cljsjs.marked
                                                       devcards-syntax-highlighter cljsjs.highlight}}}
             :tests   {:target           :browser
                       :output-dir       "resources/public/js/tests"
-                      :asset-path       "/js"
-                      :modules          {:main {:init-fn com.vadelabs.turbo-test/init}}
-                      :compiler-options {:devcards true}
+                      :asset-path       "js/tests"
+                      :modules          {:shared {}
+                                         :main   {:init-fn    com.vadelabs.turbo-test/init
+                                                  :entries    [com.vadelabs.turbo-test]
+                                                  :depends-on #{:shared}}}
+                      :compiler-options {:devcards           true
+                                         :output-feature-set :es8}
                       :build-options    {:ns-aliases {devcards-marked             cljsjs.marked
                                                       devcards-syntax-highlighter cljsjs.highlight}}}}}

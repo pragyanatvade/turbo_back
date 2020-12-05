@@ -1,18 +1,19 @@
 (ns com.vadelabs.turbo.ui.helpers
   (:require
-   [com.vadelabs.turbo.dom :as dom]
+   [com.vadelabs.turbo.components :as comp]
+   [com.vadelabs.turbo.hooks :as hooks]
    [com.vadelabs.turbo.themes :as themes]
    [taoensso.encore :as enc]))
 
-(def theme-context (dom/create-context themes/theme))
+(def theme-context (comp/create-context themes/theme))
 (defn use-theme
   []
-  (dom/use-context theme-context))
+  (hooks/use-context theme-context))
 
-(def color-mode-context (dom/create-context {}))
+(def color-mode-context (comp/create-context {}))
 (defn use-color-mode
   []
-  (dom/use-context color-mode-context))
+  (hooks/use-context color-mode-context))
 
 
 (defn use-turbo
@@ -35,7 +36,7 @@
                                                   :color-mode color-mode}
                                                  default
                                                  rest)
-         styles-ref                            (dom/use-ref {})
+         ;; styles-ref                            (hooks/use-ref {})
          styles-fn                             (fn []
                                                  (let [base        (if (fn? base) (base merged-props) base)
                                                        variant-key (keyword (:variant merged-props))
@@ -45,10 +46,12 @@
                                                        size        (get sizes size-key)
                                                        size        (if (fn? size) (size merged-props) size)
                                                        styles      (enc/merge base size variant)]
-                                                   (if (= styles (dom/ref-val styles-ref))
-                                                     (dom/ref-val styles-ref)
-                                                     (dom/set-ref-val! styles-ref styles))))]
-     (dom/use-memo styles-fn))))
+                                                   styles))
+         ;; (if (= styles @styles-ref)
+         ;;   @styles-ref
+         ;;   (swap! styles-ref styles))))
+         ]
+     (styles-fn))))
 
 (comment
 
