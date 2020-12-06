@@ -193,6 +193,5 @@
   )
 
 (defmacro props [m]
-(-props m))
-
+  (-props m))
 

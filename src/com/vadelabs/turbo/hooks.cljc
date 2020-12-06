@@ -16,15 +16,11 @@
   #?(:cljs (:require-macros [com.vadelabs.turbo.hooks])))
 
 #?(:cljs
-(do (def raw-use-effect react/useEffect)
-    (def raw-use-layout-effect react/useLayoutEffect)
-    (def raw-use-memo react/useMemo)
-    (def raw-use-callback react/useCallback)
-    (def raw-use-imperative-handle react/useImperativeHandle)))
-
-
-
-
+   (do (def raw-use-effect react/useEffect)
+       (def raw-use-layout-effect react/useLayoutEffect)
+       (def raw-use-memo react/useMemo)
+       (def raw-use-callback react/useCallback)
+       (def raw-use-imperative-handle react/useImperativeHandle)))
 
 #?(:cljs
    (defn use-state

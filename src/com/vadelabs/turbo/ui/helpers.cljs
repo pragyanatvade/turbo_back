@@ -53,8 +53,34 @@
          ]
      (styles-fn))))
 
-(comment
+(def styles-context (comp/create-context {}))
+(defn styles-provider
+  [value & children]
+  (comp/provider {:context styles-context :value value} children))
+(defn use-styles []
+  (:value (hooks/use-context styles-context)))
 
-  (use-theme)
+;; (defn cc
+;;   [opts]
+;;   (let [{:keys [strict? error-message name]
+;;          :or   {strict?       true
+;;                 error-message "useContext: `context` is undefined. Seems you forgot to wrap component within the Provider"}}
+;;         opts
+;;         context (hooks/create-context {})
+;;         ;; _           (unchecked-set context "displayName" name)
+;;         ;; use-context (fn []
+;;         ;;               (let [ctx (hooks/use-context context)]
+;;         ;;                 (if (and strict? (not ctx))
+;;         ;;                   (throw (js/Error. error-message))
+;;         ;;                   ctx)))
+;;         ;; provider    (hooks/provider context)
+;;         ]
+;;     (println "HELL" context)
+;;     ;; [provider use-context context]
+;;     ))
 
-  )
+;; (def styles-context (cc {:name          "styles-context"
+;;                          :error-message "useStyles: `styles` is undefined. Seems you forgot to wrap the components in `styles-provider`"}))
+
+;; (def styles-provider (get styles-context 0))
+;; (def use-styles (get styles-context 1))

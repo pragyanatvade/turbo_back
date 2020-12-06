@@ -4,6 +4,12 @@
    [com.vadelabs.turbo.styled.parser :as p]
    [com.vadelabs.turbo.themes :as themes]))
 
+(defn style
+  [props]
+  (let [theme (get props :theme (themes/build props))]
+    (p/parse (assoc props :theme theme)
+             p/style-keys p/pseudo-keys)))
+
 (defn stylify
   [props]
   (let [theme (get props :theme (themes/build props))

@@ -299,26 +299,208 @@
 ;;              :bg       "pink.100"} "3")))
 ;; (defcard ResponsiveStack ResponsiveStackUI)
 
-(defui ResponsiveDividerStackUI
-  []
-  (ui/stack
-    {:mt        "10"
-     :direction ["column" "row"]
-     :divider   {:border-color {:base "green.500" :md "red.200"}}
-     ;; :divider   (ui/stack-divider {:border-color {:base "green.500" :md "red.200"}})
-     :spacing   "4"}
-    (ui/box {:flex "1"
-             :w    ["100%" "40px"]
-             :h    "40px"
-             :bg   "yellow.200"} "1")
-    (ui/box {:flex "1"
-             :w    ["100%" "40px"]
-             :h    "40px"
-             :bg   "tomato"} "2")
-    (ui/box {:flex "1"
-             :w    ["100%" "40px"]
-             :h    "40px"
-             :bg   "pink.100"} "3")
-    ))
+;; (defui ResponsiveDividerStackUI
+;;   []
+;;   (ui/stack
+;;     {:mt        "10"
+;;      :direction ["column" "row"]
+;;      :divider   {:border-color {:base "green.500" :md "red.200"}}
+;;      ;; :divider   (ui/stack-divider {:border-color {:base "green.500" :md "red.200"}})
+;;      :spacing   "4"}
+;;     (ui/box {:flex "1"
+;;              :w    ["100%" "40px"]
+;;              :h    "40px"
+;;              :bg   "yellow.200"} "1")
+;;     (ui/box {:flex "1"
+;;              :w    ["100%" "40px"]
+;;              :h    "40px"
+;;              :bg   "tomato"} "2")
+;;     (ui/box {:flex "1"
+;;              :w    ["100%" "40px"]
+;;              :h    "40px"
+;;              :bg   "pink.100"} "3")
+;;     ))
 
-(defcard ResponsiveDividerStack ResponsiveDividerStackUI)
+;; (defcard ResponsiveDividerStack ResponsiveDividerStackUI)
+
+;; (defui WithDividerUI
+;;   []
+;;   (<>
+;;     (ui/stack
+;;       {:divider {}
+;;        :spacing "4"}
+;;       (ui/box {:box-size "40px" :bg "yellow.200"} "1")
+;;       (ui/box {:box-size "40px" :bg "tomato"} "2")
+;;       (ui/box {:box-size "40px" :bg "pink.100"} "3"))
+;;     (ui/stack
+;;       {:mt        "10"
+;;        :direction "row"
+;;        :divider   {}
+;;        :spacing   "4"}
+;;       (ui/box {:box-size "40px" :bg "yellow.200"} "1")
+;;       (ui/box {:box-size "40px" :bg "tomato"} "2")
+;;       (ui/box {:box-size "40px" :bg "pink.100"} "3"))))
+;; (defcard WithDivider WithDividerUI)
+
+(defui Feature
+  [{:keys [title children]}]
+  (ui/box
+    {:padding       "5"
+     :box-shadow    "md"
+     :border-width  "1px"
+     :flex          "1"
+     :border-radius "md"}
+    (ui/heading {:size "md"} title)
+    (ui/text {:mt "2"} children)))
+(def feature (comp/factory Feature))
+
+;; (defui WithContentUI
+;;   []
+;;   (ui/stack
+;;     {:direction "row"
+;;      :spacing   "8"}
+;;     (feature {:title    "Plan Money"
+;;               :children "The future can be even brighter but a goal without a plan is just a wish"})
+;;     (feature {:title    "Save Money"
+;;               :children "You deserve good things. With a whooping 10-15% interest rate per annum, grow your savings."})))
+;; (defcard WithContent WithContentUI)
+
+;; (defui WrappingChildrenUI
+;;   []
+;;   (ui/stack
+;;     {:wrap-children? true}
+;;     (ui/box "foo")
+;;     (ui/box "bar")
+;;     (ui/box "baz")))
+;; (defcard WrappingChildren WrappingChildrenUI)
+
+;; (defui ResponsiveSpacingAndDirectionUI
+;;   []
+;;   (ui/stack
+;;     {:spacing   ["10px" "60px"]
+;;      :divider   {:border-color "gray.200"}
+;;      :direction ["column" "row"]}
+;;     (ui/box {:bg-color "red.500"} "First")
+;;     (ui/box {:bg-color "blue.500"} "Second")
+;;     (ui/box {:bg-color "yellow.500"} "Third")))
+;; (defcard ResponsiveSpacingAndDirection ResponsiveSpacingAndDirectionUI)
+
+;; (defui WithCustomBorderColorUI
+;;   []
+;;   (ui/stack
+;;     {:direction {:base "column"
+;;                  :md   "row"}
+;;      :divider   {:border-color {:base "gray.200"
+;;                                 :md   "red.300"}}
+;;      :spacing   "4"}
+;;     (ui/box {:w           "40px"
+;;              :flex-shrink "0"
+;;              :h           "40px"
+;;              :bg          "yellow.200"} "1")
+;;     (ui/box {:w           "40px"
+;;              :flex-shrink "0"
+;;              :h           "40px"
+;;              :bg          "tomato"} "2")
+;;     (ui/box {:w           "40px"
+;;              :flex-shrink "0"
+;;              :h           "40px"
+;;              :bg          "pink.100"} "3")))
+;; (defcard WithCustomBorderColor WithCustomBorderColorUI)
+
+;; (defui BasicWrapUI
+;;   []
+;;   (ui/wrap
+;;     {:spacing "40px"}
+;;     (ui/wrap-item
+;;       {:key "1"}
+;;       (ui/badge "Badge 1"))
+;;     (ui/wrap-item
+;;       (ui/badge "Badge 2"))
+;;     (ui/wrap-item
+;;       (ui/badge "Badge 3"))
+;;     (ui/wrap-item
+;;       (ui/badge "Badge 4"))))
+;; (defcard BasicWrap BasicWrapUI)
+
+;; (defui Placeholder
+;;   []
+;;   (ui/wrap-item
+;;     (d/div {:style {:height     "48px"
+;;                     :width      "48px"
+;;                     :background "tomato"}})))
+;; (def placeholder (comp/factory Placeholder))
+
+;; (defui WrapPlaceholderUI
+;;   []
+;;   (ui/wrap
+;;     {:spacing "5"}
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)))
+;; (defcard WrapPlaceholder WrapPlaceholderUI)
+
+;; (defui WrapResponsiveUI
+;;   []
+;;   (ui/wrap
+;;     {:spacing ["12px" "24px"]
+;;      :justify ["center" "flex-start"]}
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)
+;;     (placeholder)))
+;; (defcard WrapResponsive WrapResponsiveUI)
+
+;; (defui WithVideoUI
+;;   []
+;;   (ui/aspect-ratio
+;;     {:max-width "300px"
+;;      :ratio     "1"}
+;;     (d/iframe {:title             "test"
+;;                :src               "https://www.youtube.com/embed/QhBnZ6NPOY0"
+;;                :allow-full-screen true})))
+;; (defcard WithVideo WithVideoUI)
+
+;; (defui WithImageUI
+;;   []
+;;   (ui/aspect-ratio
+;;     {:max-width "400px"}
+;;     (d/img {:src "https://upload.wikimedia.org/wikipedia/en/7/7d/Minions_characters.png"
+;;             :alt "minions"})))
+;; (defcard WithImage WithImageUI)
+
+;; (defui WithMapUI
+;;   []
+;;   (ui/aspect-ratio
+;;     {:max-width "600px"
+;;      :ratio     "1.777"}
+;;     (d/iframe {:src   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.952912260219!2d3.375295414770757!3d6.5276316452784755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b2ae68280c1%3A0xdc9e87a367c3d9cb!2sLagos!5e0!3m2!1sen!2sng!4v1567723392506!5m2!1sen!2sng"
+;;                :title "demo"})))
+;; (defcard WithMap WithMapUI)
+
+;; (defui WithResponsiveUI
+;;   []
+;;   (ui/aspect-ratio
+;;     {:max-width "300px"
+;;      :ratio     {:base "1"
+;;                  :sm   "1.3333"
+;;                  :md   "1.7777"
+;;                  :lg   "2.3333"}}
+;;     (ui/box {:background-color
+;;              {:base "red.500"
+;;               :sm   "red.400"
+;;               :md   "red.300"
+;;               :lg   "red.200"}}
+;;             "BOX")))
+;; (defcard WithResponsive WithResponsiveUI)

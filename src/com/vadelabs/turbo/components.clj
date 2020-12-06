@@ -36,8 +36,19 @@
 (defmacro <>
   "Creates a new React Fragment Element"
   [& children]
-  (println "CHILDREN" children)
   `^js/React.Element ($ Fragment ~@children))
+
+(defmacro provider
+  "Creates a Provider for a React Context value.
+  Example:
+    (def my-context (react/createContext))
+    (provider {:context my-context :value my-value} child1 child2 ...childN)"
+  [{:keys [context value] :as props} & children]
+  `^js/React.Element ($ (.-Provider ~context)
+                        ;; use contains to guard against `nil`
+                        ~@(when (contains? props :value)
+                            `({:value ~value}))
+                        ~@children))
 
 (defn defui*
   [display-name props-bindings body]

@@ -4,7 +4,9 @@
    [com.vadelabs.turbo.components :as comp :refer [defui <> $]]
    [com.vadelabs.turbo.ui.styled :as ui]
    [com.vadelabs.turbo.ui.helpers :as tuh]
-   [taoensso.encore :as enc]))
+   [taoensso.encore :as enc]
+   [com.vadelabs.turbo.dom :as d]
+   [com.vadelabs.turbo.styled :as styled]))
 
 (defui Box
   [props]
@@ -12,9 +14,52 @@
     (ui/block props children)))
 (def box (comp/factory Box))
 
-;; (defui AspectRatio
-;;   [props]
-;;   )
+(defn- ratio-fn
+  [ratio]
+  (cond
+    (vector? ratio) (into
+                      []
+                      (map
+                        (fn [val]
+                          (str (* 100 (/ 1 val)) "%"))
+                        ratio))
+    (map? ratio)    (reduce-kv
+                      (fn [acc key val]
+                        (assoc acc key (str (* 100 (/ 1 val)) "%")))
+                      {}
+                      ratio)
+    :else           (str (* 100 (/ 1 ratio)) "%")))
+
+(defui AspectRatio
+  [props]
+  (let [{:keys [children ratio]
+         :or   {ratio "1.3333"}} props
+        child                    children
+        padding-bottom           (ratio-fn ratio)
+        styles                   {:combinators {">*"
+                                                {:overflow        "hidden"
+                                                 :position        "absolute"
+                                                 :top             "0"
+                                                 :right           "0"
+                                                 :bottom          "0"
+                                                 :left            "0"
+                                                 :display         "flex"
+                                                 :justify-content "center"
+                                                 :align-items     "center"
+                                                 :width           "100%"
+                                                 :height          "100%"}
+                                                ">img,>video"
+                                                {:object-fit "cover"}}}
+        props                    (enc/assoc-some
+                                   props
+                                   :turbo$css styles
+                                   :position "relative"
+                                   :pseudo {:before {:height         "0"
+                                                     :content        "''"
+                                                     :display        "block"
+                                                     :padding-bottom padding-bottom}})]
+    (box props child)))
+(def aspect-ratio (comp/factory AspectRatio))
 
 (defui Badge
   [props]
@@ -75,7 +120,6 @@
                                   :turbo$css (assoc style
                                                     :display "inline-block")
                                   :as                "code")]
-    ;; [:& Box rest children]
     (box props children)))
 (def code (comp/factory Code))
 
@@ -269,13 +313,12 @@
                                             :href href
                                             :target target
                                             :rel rel)]
-    (box props
-         (link-overlay link-overlay-props children))
-    ;; [:& Box props children
-    ;;  [:& LinkOverlay {:href   href
-    ;;                   :target (when external? "_blank")
-    ;;                   :rel    (when external? "noopener noreferrer")}]]
-    ))
+
+    (box
+      props
+      children
+      ;; (link-overlay link-overlay-props)
+      )))
 (def link-box (comp/factory LinkBox))
 
 (defui Link
@@ -438,9 +481,13 @@
                                            (map (fn [item]
                                                   (get styles (keyword item)))
                                                 direction))
+                 (map? direction)    (reduce-kv
+                                       (fn [acc key val]
+                                         (assoc acc key (get styles (keyword val))))
+                                       {}
+                                       direction)
                  :else               [(get styles (keyword direction))])]
     {:combinators {"&" value}}))
-
 
 (defui Stack
   [props]
@@ -471,13 +518,14 @@
                                                             (when-not (= child last-child)
                                                               divider))]
                                            (recur (rest children) (inc idx) (conj result fragment) last-child)))))
-        props                      (enc/assoc-some props
-                                                   :turbo$css (when-not divider? styles)
-                                                   :display "flex"
-                                                   :align-items align
-                                                   :justify-content justify
-                                                   :flex-direction direction
-                                                   :flex-wrap wrap)
+        props                      (enc/assoc-some
+                                     props
+                                     :turbo$css (when-not divider? styles)
+                                     :display "flex"
+                                     :align-items align
+                                     :justify-content justify
+                                     :flex-direction direction
+                                     :flex-wrap wrap)
         ]
     (box props clones)))
 (def stack (comp/factory Stack))
@@ -503,8 +551,10 @@
 (defui Text
   [props]
   (let [{:keys [children align decoration casing]} props
+        style                                      (tuh/use-style-config :Text props)
         props                                      (enc/assoc-some
                                                      props
+                                                     :turbo$css style
                                                      :text-align align
                                                      :text-decoration decoration
                                                      :text-transform casing
@@ -512,20 +562,80 @@
     (box props children)))
 (def text (comp/factory Text))
 
-;; (defui Wrap
-;; [props]
-;;   (let [{:keys [children spacing justify direction align]} props
-;;       rest                                               (dissoc props :children
-;;                                                                  :spacing :justify :direction
-;;                                                                  :align)
-;;       rest                                               (assoc rest
-;;                                                                 :as :ul)]
-;;   [:& Box rest children]))
+(defn- space-fn
+  [spacing theme dir]
+  (let [value (cond
+                (vector? spacing) (into [] (map (fn [space]
+                                                  (let [{:keys [margin]}
+                                                        (styled/style
+                                                          {:margin space
+                                                           :theme  theme})]
+                                                    (str "calc(" margin " / 2 * " dir " )")))
+                                                spacing))
+                (map? spacing)    (reduce-kv
+                                    (fn [acc key val]
+                                      (let [{:keys [margin]} (styled/style
+                                                               {:margin val
+                                                                :theme  theme})]
+                                        (assoc acc key "calc(" margin " / 2 * " dir " )")))
+                                    {}
+                                    spacing)
+                :else             (let [{:keys [margin]}
+                                        (styled/style
+                                          {:margin spacing
+                                           :theme  theme})]
+                                    (str "calc(" margin " / 2 * " dir " )")))]
+    value))
 
-;; (defui WrapItem
-;;   [props]
-;;   (let [{:keys [children]} props
-;;         rest               (dissoc props :children)
-;;         rest               (assoc rest
-;;                                   :as :li)]
-;;     [:& Box rest children]))
+(defn- group-spacing
+  [spacing theme]
+  (space-fn spacing theme "-1"))
+
+(defn- item-spacing
+  [spacing theme]
+  (space-fn spacing theme "1"))
+
+(defui Wrap
+  [props]
+  (let [{:keys [children spacing
+                justify direction
+                align]} props
+        theme           (tuh/use-theme)
+        group-spacing   (group-spacing spacing theme)
+        item-spacing    (item-spacing spacing theme)
+        group-styles    (enc/assoc-some
+                          {}
+                          :display "flex"
+                          :flex-wrap "wrap"
+                          :justify-content justify
+                          :align-items align
+                          :flex-direction direction
+                          :list-style-type "none"
+                          :padding "0"
+                          :margin group-spacing)
+        item-styles     (enc/assoc-some
+                          {}
+                          :display "flex"
+                          :align-items "flex-start"
+                          :margin item-spacing)]
+    (tuh/styles-provider
+      {:value {:item item-styles}}
+      (box {:key "wrap"}
+           (box
+             (enc/assoc-some
+               props
+               :turbo$css group-styles
+               :as "ul")
+             children)))))
+(def wrap (comp/factory Wrap))
+
+(defui WrapItem
+  [props]
+  (let [{:keys [children]} props
+        styles             (:item (tuh/use-styles))
+        props              (enc/assoc-some
+                             props
+                             :turbo$css styles
+                             :as "li")]
+    (box props children)))
+(def wrap-item (comp/factory WrapItem))

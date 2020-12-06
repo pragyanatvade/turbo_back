@@ -131,7 +131,7 @@
                         (fn [acc key val]
                           (let [val (cond
                                       (vector? val) (first val)
-                                      (map? val)    (:base val)
+                                      (map? val)    (get val :base val)
                                       :else         val)]
                             (conj acc [key (:style (parser config val style-keys pseudo-keys theme))])))
                         []
@@ -140,7 +140,15 @@
                         (fn [acc key val]
                           (let [val                               (cond
                                                                     (vector? val) (rest val)
-                                                                    :else         val)
+                                                                    (map? val)    (into
+                                                                                    []
+                                                                                    (map
+                                                                                      (fn [key]
+                                                                                        (if (key val)
+                                                                                          (key val)
+                                                                                          nil))
+                                                                                      [:sm :md :lg :xl]))
+                                                                    :else         nil)
                                 {:keys [breakpoints]
                                  :or   {breakpoints
                                         (:breakpoints DEFAULTS)}} theme
@@ -159,6 +167,7 @@
                           )
                         []
                         comb-props)
+         _            (println "COMB" comb-props comb)
          comb         (when (not-empty comb) comb)
          comb         (if (not-empty media-comb)
                         (into comb media-comb)
