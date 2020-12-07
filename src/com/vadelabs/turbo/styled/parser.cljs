@@ -433,6 +433,4 @@
 
 (def parse (system config))
 
-(def pseudo-keys #{:hover :before :focus})
-(def combinator-keys #{:> :-})
 (def style-keys (set (keys config)))

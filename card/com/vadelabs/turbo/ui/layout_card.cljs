@@ -78,7 +78,7 @@
 ;;                  :mr           "2"} color-scheme))))
 ;; (defcard OutlineBadge OutlineBadgeUI)
 
-
+;; ;; CODE ;;
 ;; (defui CodeUI
 ;;   []
 ;;   (ui/code {:color-scheme "pink"} "import React from react"))
@@ -121,22 +121,25 @@
 ;;   (ui/divider {:variant "dashed"}))
 ;; (defcard DashedDivider DashedDividerUI)
 
+;; ;; KBD ;;
 ;; (defui KbdUI
 ;;   []
 ;;   (ui/kbd "Ctrl + L"))
 ;; (defcard Kbd KbdUI)
 
+;; ;; HEADING ;;
 ;; (defui HeadingUI
 ;;   []
 ;;   (ui/heading "Heading 1"))
 ;; (defcard Heading HeadingUI)
 
-;; (defui LinkUI
-;;   []
-;;   (ui/link
-;;     {:external? true :href "google.com"}
-;;     "This is a link"))
-;; (defcard Link LinkUI)
+;; LINK ;;
+(defui LinkUI
+  []
+  (ui/link
+    {:external? true :href "google.com"}
+    "This is a link"))
+(defcard Link LinkUI)
 
 ;; (defui DefaultListUI
 ;;   []

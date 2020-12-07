@@ -5,6 +5,7 @@
 
 (defmacro $
   [type & args]
+  (println "TYPE" type args (symbol? (first args)) (tana/inferred-type &env (first args))
   (when (and (symbol? (first args))
              (= (tana/inferred-type &env (first args))
                 'cljs.core/IMap))

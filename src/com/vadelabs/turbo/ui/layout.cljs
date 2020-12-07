@@ -1,11 +1,10 @@
 (ns com.vadelabs.turbo.ui.layout
   (:refer-clojure :exclude [Box List list])
   (:require
-   [com.vadelabs.turbo.components :as comp :refer [defui <> $]]
+   [com.vadelabs.turbo.components :as comp :refer [defui <>]]
    [com.vadelabs.turbo.ui.styled :as ui]
    [com.vadelabs.turbo.ui.helpers :as tuh]
    [taoensso.encore :as enc]
-   [com.vadelabs.turbo.dom :as d]
    [com.vadelabs.turbo.styled :as styled]))
 
 (defui Box
@@ -313,7 +312,7 @@
                                             :href href
                                             :target target
                                             :rel rel)]
-
+    
     (box
       props
       children

@@ -7,12 +7,9 @@
 (defn style
   [props]
   (let [theme (get props :theme (themes/build props))]
-    (p/parse (assoc props :theme theme)
-             p/style-keys p/pseudo-keys)))
+    (p/parse (assoc props :theme theme) p/style-keys)))
 
 (defn stylify
   [props]
-  (let [theme (get props :theme (themes/build props))
-        style (p/parse (assoc props :theme theme)
-                       p/style-keys p/pseudo-keys)]
+  (let [style (style props)]
     (:class (use-style style))))

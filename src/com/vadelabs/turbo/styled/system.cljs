@@ -58,9 +58,9 @@
           (recur acc (inc idx) (rest val)))))))
 
 (defn- parser
-  ([config props style-keys pseudo-keys]
-   (parser config props style-keys pseudo-keys (:theme props)))
-  ([config props style-keys pseudo-keys theme]
+  ([config props style-keys]
+   (parser config props style-keys (:theme props)))
+  ([config props style-keys theme]
    (let [props        (enc/merge  (:turbo$css props) props)
          style-props  (filter-props props style-keys)
          pseudo-props (:pseudo props)
@@ -112,7 +112,7 @@
                         {} style-props)
          pseudo       (reduce-kv
                         (fn [acc key val]
-                          (let [{:keys [style media]} (parser config val style-keys pseudo-keys theme)
+                          (let [{:keys [style media]} (parser config val style-keys theme)
                                 style                 (when-not (empty? style) {key style})
                                 media                 (when-not (empty? media) {key media})
                                 media                 (reduce-kv
@@ -133,7 +133,7 @@
                                       (vector? val) (first val)
                                       (map? val)    (get val :base val)
                                       :else         val)]
-                            (conj acc [key (:style (parser config val style-keys pseudo-keys theme))])))
+                            (conj acc [key (:style (parser config val style-keys theme))])))
                         []
                         comb-props)
          media-comb   (reduce-kv
@@ -159,7 +159,7 @@
                                                                     (if (or (empty? val) (nil? val))
                                                                       acc
                                                                       (let [query (get media-queries idx)
-                                                                            style (:style (parser config (first val) style-keys pseudo-keys theme))]
+                                                                            style (:style (parser config (first val) style-keys theme))]
                                                                         (if (and query style)
                                                                           (recur (conj acc (at-media query [[key style]])) (inc idx) (rest val))
                                                                           (recur acc (inc idx) (rest val))))))]
@@ -167,7 +167,6 @@
                           )
                         []
                         comb-props)
-         _            (println "COMB" comb-props comb)
          comb         (when (not-empty comb) comb)
          comb         (if (not-empty media-comb)
                         (into comb media-comb)
@@ -176,13 +175,12 @@
      {:style       (when-not (empty? style) style)
       :media       (when-not (empty? media) media)
       :pseudo      (when-not (empty? pseudo) (:style pseudo))
-      :combinators (when-not (empty? comb) comb)
-      })))
+      :combinators (when-not (empty? comb) comb)})))
 
 (defn- create-parser
   [config]
-  (fn [props style-keys pseudo-keys]
-    (let [{:keys [style media pseudo combinators]} (parser config props style-keys pseudo-keys)]
+  (fn [props style-keys]
+    (let [{:keys [style media pseudo combinators]} (parser config props style-keys)]
       (enc/assoc-some
         style
         ::stylefy/media media
@@ -190,8 +188,8 @@
         ::stylefy/manual combinators))))
 
 (defn- create-style-function
-[{:keys [properties property scale transform default-scale]
-  :or   {transform get-value}}]
+  [{:keys [properties property scale transform default-scale]
+    :or   {transform get-value}}]
   (let [properties (or properties [property])
         style-fn   (fn [value scale props]
                      (let [final-value (transform value scale props)]
