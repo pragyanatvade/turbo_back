@@ -5,7 +5,6 @@
 
 (defmacro $
   [type & args]
-  (println "TYPE" type args (symbol? (first args)) (tana/inferred-type &env (first args))
   (when (and (symbol? (first args))
              (= (tana/inferred-type &env (first args))
                 'cljs.core/IMap))
@@ -22,6 +21,7 @@
         type     (if (keyword? type)
                    (name type)
                    type)]
+
     (cond
       (map? (first args))
       `^js/React.Element (.createElement
@@ -32,7 +32,8 @@
                               `(com.vadelabs.turbo.helpers/props ~(first args)))
                            ~@(rest args))
 
-      :else `^js/React.Element (.createElement (get-react) ~type nil ~@args))))
+      :else `^js/React.Element (.createElement (get-react) ~type nil ~@args))
+    ))
 
 (defmacro <>
   "Creates a new React Fragment Element"
@@ -49,7 +50,8 @@
                         ;; use contains to guard against `nil`
                         ~@(when (contains? props :value)
                             `({:value ~value}))
-                        ~@children))
+                        ~@children)
+  )
 
 (defn defui*
   [display-name props-bindings body]

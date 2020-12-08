@@ -74,11 +74,24 @@
    :default {:size "xl"}})
 
 (def Divider
-  {:base     {:border       "0"
-              :opacity      "0.6"
-              :border-color "inherit"}
-   :variants {:solid  {:border-style "solid"}
-              :dashed {:border-style "dashed"}}
+  {:base     {:border              "0"
+              :opacity             "0.6"
+              ;; :border-color "inherit"
+              :border-top-color    "inherit"
+              :border-bottom-color "inherit"
+              :border-right-color  "inherit"
+              :border-left-color   "inherit"          
+              }
+   :variants {:solid  {;; border-style "solid"
+                       :border-top-style    "solid"
+                       :border-bottom-style "solid"
+                       :border-right-style  "solid"
+                       :border-left-style   "solid"}
+              :dashed {;; border-style "dashed"
+                       :border-top-style    "dashed"
+                       :border-bottom-style "dashed"
+                       :border-right-style  "dashed"
+                       :border-left-style   "dashed"}}
    :default  {:variant "solid"}})
 
 (def Kbd

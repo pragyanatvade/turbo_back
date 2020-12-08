@@ -8,14 +8,22 @@
 
 (defui Block
   [props]
-  (let [{:keys [as children]
+  (let [{:keys [as children href
+                target rel key
+                role aria-orientation]
          :or   {as "div"}} props
         attrs              (enc/assoc-some
                              {}
-                             :className (stylify props))
-        ;; attrs              {:className (stylify props)}
-        ]
-    ;; (println "ATTRS" attrs)
-    ($ as attrs children)))
+                             :className (stylify props)
+                             :href href
+                             :target target
+                             :rel rel
+                             :key key
+                             :role role
+                             :aria-orientation aria-orientation)
+        tag                (if (keyword? as)
+                             (name as)
+                             as)]
+    ($ (str tag) {:& attrs} children)))
 
 (def block (comp/factory Block))

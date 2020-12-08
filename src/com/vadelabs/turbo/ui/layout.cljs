@@ -162,6 +162,8 @@
   (let [{:keys [children orientation]
          :or   {orientation "horizontal"}} props
         style                              (tuh/use-style-config :Divider props)
+        ;; _                                  (println "STYLE" style)
+        style                              (assoc style :borderStyle "solid")
         {:keys [border-left-width
                 border-right-width
                 border-width
