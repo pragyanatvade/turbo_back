@@ -1,7 +1,7 @@
 (ns com.vadelabs.turbo.ui.layout-card
   (:require
    [devcards.core :as dc]
-   [com.vadelabs.turbo.components :as comp :refer [defui <> $]]
+   [com.vadelabs.turbo.components :as comp :refer [defui <>]]
    [com.vadelabs.turbo.ui.layout :as ui]
    [com.vadelabs.turbo.dom :as d])
   (:require-macros

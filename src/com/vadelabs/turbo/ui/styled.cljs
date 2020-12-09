@@ -10,7 +10,8 @@
   [props]
   (let [{:keys [as children href
                 target rel key
-                role aria-orientation]
+                role aria-orientation
+                focusable view-box]
          :or   {as "div"}} props
         attrs              (enc/assoc-some
                              {}
@@ -20,7 +21,9 @@
                              :rel rel
                              :key key
                              :role role
-                             :aria-orientation aria-orientation)
+                             :aria-orientation aria-orientation
+                             :focusable focusable
+                             :view-box view-box)
         tag                (if (keyword? as)
                              (name as)
                              as)]

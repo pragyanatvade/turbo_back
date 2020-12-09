@@ -80,8 +80,7 @@
               :border-top-color    "inherit"
               :border-bottom-color "inherit"
               :border-right-color  "inherit"
-              :border-left-color   "inherit"          
-              }
+              :border-left-color   "inherit"}
    :variants {:solid  {;; border-style "solid"
                        :border-top-style    "solid"
                        :border-bottom-style "solid"
