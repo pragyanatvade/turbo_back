@@ -1,4 +1,5 @@
 (ns com.vadelabs.turbo.themes.components
+  (:refer-clojure :exclude [List])
   (:require [com.vadelabs.turbo.themes.helpers :as h]))
 
 (defn- variant-solid
@@ -113,10 +114,22 @@
           :pseudo          {:hover {:text-decoration "underline"}
                             :focus {:box-shadow "outline"}}}})
 
+(def ^:private parts [:container :item :icon])
+(def ^:private base-style-container {})
+(def ^:private base-style-item {})
+(def ^:private base-style-icon {:margin-right   "0.5rem"
+                                :display        "inline"
+                                :vertical-align "text-bottom"})
+(def List
+  {:parts parts
+   :base  {:container base-style-container
+           :item      base-style-item
+           :icon      base-style-icon}})
 (def components
   {:Badge   Badge
    :Kbd     Kbd
    :Heading Heading
    :Code    Code
    :Divider Divider
-   :Link    Link})
+   :Link    Link
+   :List    List})

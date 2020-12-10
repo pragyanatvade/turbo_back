@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [Box List list])
   (:require
    [com.vadelabs.turbo.components :as comp :refer [defui <>]]
+   [com.vadelabs.turbo.ui.icons :refer [icon]]
    [com.vadelabs.turbo.ui.styled :as ui]
    [com.vadelabs.turbo.ui.helpers :as tuh]
    [taoensso.encore :as enc]
@@ -338,13 +339,21 @@
   [props]
   (let [{:keys [as children style-type style-position spacing]
          :or   {style-type "none"}} props
-        props                       (enc/assoc-some props
-                                                    :list-style-type style-type
-                                                    :list-style-position style-position
-                                                    :role "list"
-                                                    :turbo$css (if spacing {} {}) ;; TODO
-                                                    :as (or as "ul"))]
-    (box props children)))
+        styles                      (tuh/use-multi-style-config :List props)
+        spacing-style               (when spacing
+                                      {:combinator {">*:not(style) ~*:not(style)" {:mt spacing}}})
+        props                       (enc/assoc-some
+                                      props
+                                      :list-style-type style-type
+                                      :list-style-position style-position
+                                      :role "list"
+                                      :turbo$css (enc/merge
+                                                   (:container styles)
+                                                   spacing-style)
+                                      :as (or as "ul"))]
+    (tuh/styles-provider
+      {:value styles}
+      (box props children))))
 (def list (comp/factory List))
 
 (defui OrderedList
@@ -370,15 +379,21 @@
 (defui ListItem
   [props]
   (let [{:keys [children]} props
+        styles             (tuh/use-styles)
         props              (assoc props
+                                  :turbo$css (:item styles)
                                   :as "li")]
     (box props children)))
 (def list-item (comp/factory ListItem))
 
 (defui ListIcon
   [props]
-  (let [{:keys [children]} props]
-    (box props children)))
+  (let [{:keys [children]} props
+        styles             (tuh/use-styles)
+        props              (assoc props
+                                  :turbo$override (:icon styles)
+                                  :role "presentation")]
+    (icon props children)))
 (def list-icon (comp/factory ListIcon))
 
 (defn- width-to-columns

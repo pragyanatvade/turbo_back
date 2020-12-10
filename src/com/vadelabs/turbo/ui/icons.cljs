@@ -24,7 +24,7 @@
 
 (defui Icon
   [props]
-  (let [{:keys [view-box color
+  (let [{:keys [as view-box color
                 focusable children]
          :or   {color     "currentColor"
                 view-box  (:view-box fallback)
@@ -45,9 +45,16 @@
                                     :view-box view-box
                                     :focusable focusable
                                     :as "svg")
-        ]
-    (ui/block props children)))
+        tag                       (if (fn? as)
+                                    as
+                                    ui/block)]
+    (tag props children)))
 (def icon (comp/factory Icon))
+
+(comment
+
+  (enc/merge {:a 1 :b 1} {:a 2})
+  )
 
 (defn create-icon
   [opts]

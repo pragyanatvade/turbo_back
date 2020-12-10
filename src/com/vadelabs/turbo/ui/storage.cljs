@@ -3,7 +3,6 @@
   (:require
    [cljs.reader :as reader]))
 
-
 (def storage (.-localStorage js/window))
 (def safe-prefix "turbo-ui-")
 (defn- safe-key

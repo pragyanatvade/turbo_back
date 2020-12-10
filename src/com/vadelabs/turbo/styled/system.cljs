@@ -61,7 +61,10 @@
   ([config props style-keys]
    (parser config props style-keys (:theme props)))
   ([config props style-keys theme]
-   (let [props        (enc/merge (:turbo$css props) props)
+   (let [props        (enc/merge
+                        (:turbo$css props)
+                        props
+                        (:turbo$override props))
          style-props  (filter-props props style-keys)
          pseudo-props (:pseudo props)
          comb-props   (:combinators props)

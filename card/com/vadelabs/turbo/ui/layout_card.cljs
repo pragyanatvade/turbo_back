@@ -3,6 +3,7 @@
    [devcards.core :as dc]
    [com.vadelabs.turbo.components :as comp :refer [defui <>]]
    [com.vadelabs.turbo.ui.layout :as ui]
+   [com.vadelabs.turbo.ui.icons :as icons]
    [com.vadelabs.turbo.dom :as d])
   (:require-macros
    [devcards.core :refer [defcard]]))
@@ -177,17 +178,17 @@
       {:spacing "3"}
       (ui/list-item
         (ui/list-icon
-          {:as    "fa-check"
+          {:as    icons/add
            :color "green.500"})
         "Lorem ipsum dolor sit amet, consectetur adipisicing elit")
       (ui/list-item
         (ui/list-icon
-          {:as    "fa-phone"
+          {:as    icons/search
            :color "green.500" })
         "Assumenda, quia temporibus eveniet a libero incidunt suscipit")
       (ui/list-item
         (ui/list-icon
-          {:as    "fa-accessible-icon"
+          {:as    icons/add
            :color "green.500"})
         "Quidem, ipsam illum quis sed voluptatum quae eum fugit earum"))))
 (defcard UnstyledWithIcon UnstyledWithIconUI)
