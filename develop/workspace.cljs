@@ -29,8 +29,7 @@
     (ui/box {:flex "1"
              :w    ["100%" "40px"]
              :h    "40px"
-             :bg   "pink.100"} "3")
-    ))
+             :bg   "pink.100"} "3")))
 
 
 (def root-ui (comp/factory Root))
