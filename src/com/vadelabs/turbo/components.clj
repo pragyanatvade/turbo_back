@@ -31,9 +31,7 @@
                               `(com.vadelabs.turbo.helpers/native-props ~(first args))
                               `(com.vadelabs.turbo.helpers/props ~(first args)))
                            ~@(rest args))
-
-      :else `^js/React.Element (.createElement (get-react) ~type nil ~@args))
-    ))
+      :else `^js/React.Element (.createElement (get-react) ~type nil ~@args))))
 
 (defmacro <>
   "Creates a new React Fragment Element"
@@ -50,8 +48,7 @@
                         ;; use contains to guard against `nil`
                         ~@(when (contains? props :value)
                             `({:value ~value}))
-                        ~@children)
-  )
+                        ~@children))
 
 (defn defui*
   [display-name props-bindings body]
@@ -83,8 +80,7 @@
                             opts-map? (rest))
         ;; component-fn-name (with-meta (symbol (str display-name "-render-type"))
         ;;                     {:private true})
-        component-fn-name display-name
-        ]
+        component-fn-name display-name]
     `(do
        (def ~(vary-meta
                component-fn-name

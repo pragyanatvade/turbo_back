@@ -174,13 +174,18 @@
   grid-config)
 (def grid (system grid-aliases))
 
+
 ;; LAYOUT ;;
 (defn- get-width
   [n scale]
   (let [default (if (or (not (number? n)) (> n 1))
                   n
                   (str (* n 100) "%"))
-        k       (if (vector? n) n [n])]
+        k       (if (vector? n) n [n])
+        k (into [] (map (fn [item]
+                          (if (or (string? item) (number? item))
+                            (keyword item)
+                            item)) k))]
     (get-in scale k default)))
 (def ^:private layout-config
   {:width          {:property  :width
@@ -240,7 +245,10 @@
    :object-position true
    :float           true
    :will-change     true
-   :content         true})
+   :content         true
+   :border-collapse true
+   :font-variant-numeric true
+   :caption-side true})
 (def ^:private others-aliases
   others-config)
 (def others (system others-aliases))

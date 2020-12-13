@@ -9,11 +9,12 @@
 (defui Block
   [props]
   (let [{:keys [as children href
-                target rel key alt
+                target rel alt
                 role aria-orientation
                 focusable view-box
                 height width src loading
-                cross-origin html-height html-width]
+                cross-origin html-height html-width
+                data-is-numeric]
          :or   {as "div"}} props
         attrs              (enc/assoc-some
                              {}
@@ -21,7 +22,6 @@
                              :href href
                              :target target
                              :rel rel
-                             :key key
                              :role role
                              :aria-orientation aria-orientation
                              :focusable focusable
@@ -31,7 +31,8 @@
                              :alt alt
                              :src src
                              :loading loading
-                             :cross-origin cross-origin)
+                             :cross-origin cross-origin
+                             :data-is-numeric data-is-numeric)
         tag (cond
               (keyword? as) (str (name as))
               :else (str as))]

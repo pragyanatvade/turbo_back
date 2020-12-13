@@ -125,6 +125,95 @@
    :base  {:container base-style-container
            :item      base-style-item
            :icon      base-style-icon}})
+
+(def ^:private numeric-styles {"&[data-is-numeric=true]" {:text-align "right"}})
+
+(defn- simple-variant
+  [props]
+  (let [{:keys [color-scheme]} props]
+    {:th {:color ((h/mode "gray.600" "gray.400") props)
+          :border-bottom "1px"
+          :border-color ((h/mode (str color-scheme ".100") (str color-scheme ".700")) props)
+          :combinators numeric-styles}
+     :td {:border-bottom "1px"
+          :border-color ((h/mode (str color-scheme ".100") (str color-scheme ".700")) props)
+          :combinators numeric-styles}
+     :caption {:color ((h/mode "gray.600" "gray.100") props)}
+     :tfoot {:combinators {"tr:last-of-type th" {:border-bottom-width "0"}}}}))
+
+(defn- striped-variant
+  [props]
+  (let [{:keys [color-scheme]} props
+        border-bottom "1px"
+        border-color ((h/mode (str color-scheme ".100") (str color-scheme ".700")) props)]
+    {:th {:color ((h/mode "gray.600" "gray.400") props)
+          :border-bottom border-bottom
+          :border-color border-color
+          :combinators numeric-styles}
+     :td {:border-bottom border-bottom
+          :border-color border-color
+          :combinators numeric-styles}
+     :caption {:color ((h/mode "gray.600" "gray.100") props)}
+     :tbody {:combinators {"tr:nth-of-type(odd) th" {:border-bottom-width "1px"
+                                                     :border-color ((h/mode (str color-scheme ".100") (str color-scheme ".700")) props)}
+                           "tr:nth-of-type(odd) td" {:border-bottom-width "1px"
+                                                     :border-color ((h/mode (str color-scheme ".100") (str color-scheme ".700")) props)
+                                                     :background ((h/mode (str color-scheme ".100") (str color-scheme ".700")) props)}}}
+     :tfoot {:combinators {"tr:last-of-type th" {:border-bottom-width "0"}}}}))
+
+(def Table
+  {:parts [:table :thead :tbody :tr :th :td :caption]
+   :base {:table {:font-variant-numeric "lining-nums tabular-nums"
+                  :border-collapse "collapse"
+                  :width "full"}
+          :th {:font-family "heading"
+               :font-weight "bold"
+               :text-transform "uppercase"
+               :letter-spacing "wider"
+               :text-align "left"}
+          :td {:text-align "left"}
+          :caption {:mt "4"
+                    :font-family "heading"
+                    :text-align "center"
+                    :font-weight "medium"}}
+   :variants {:simple simple-variant
+              :striped striped-variant
+              :unstyled {}}
+   :sizes {:sm {:th {:px "4"
+                     :py "1"
+                     :line-height "4"
+                     :font-size "xs"}
+                :td {:px "4"
+                     :py "2"
+                     :font-size "sm"
+                     :line-height "4"}
+                :caption {:px "4"
+                          :py "2"
+                          :font-size "xs"}}
+           :md {:th {:px "6"
+                     :py "3"
+                     :line-height "4"
+                     :font-size "xs"}
+                :td {:px "6"
+                     :py "4"
+                     :line-height "5"}
+                :caption {:px "6"
+                          :py "2"
+                          :font-size "sm"}}
+           :lg {:th {:px "8"
+                     :py "4"
+                     :line-height "5"
+                     :font-size "sm"}
+                :td {:px "8"
+                     :py "5"
+                     :line-height "6"}
+                :caption {:px "6"
+                          :py "2"
+                          :font-size "md"}}}
+   :default {:variant "simple"
+             :size "md"
+             :color-scheme "gray"}})
+
 (def components
   {:Badge   Badge
    :Kbd     Kbd
@@ -132,4 +221,6 @@
    :Code    Code
    :Divider Divider
    :Link    Link
-   :List    List})
+   :List    List
+   :Table   Table
+   })

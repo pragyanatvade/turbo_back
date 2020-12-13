@@ -1,2 +1,2 @@
 = turbo
-> React framework to turbocharge your frontend development.
+> Clojurescript framework to turbocharge your frontend development in clojurescript.

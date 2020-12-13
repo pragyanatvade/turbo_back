@@ -45,7 +45,7 @@
                                                              size-key    (keyword (:size merged-props))
                                                              size        (get sizes size-key)
                                                              size        (if (fn? size) (size merged-props) size)
-                                                             styles      (enc/merge base size variant)
+                                                             styles      (enc/nested-merge base size variant)
                                                              ;; styles      (if (and multi-part? parts)
                                                              ;;               (reduce
                                                              ;;                 (fn [acc part]
@@ -67,7 +67,7 @@
 
 (def styles-context (comp/create-context {}))
 (defn styles-provider
-  [value & children]
+  [value children]
   (comp/provider {:context styles-context :value value} children))
 (defn use-styles []
   (:value (hooks/use-context styles-context)))
