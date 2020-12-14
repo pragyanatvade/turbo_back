@@ -121,19 +121,21 @@
                        {} style-props)
          pseudo       (reduce-kv
                        (fn [acc key val]
+
                          (let [{:keys [style media]} (parser config val style-keys theme)
                                style                 (when-not (empty? style) {key style})
                                media                 (when-not (empty? media) {key media})
+
                                media                 (reduce-kv
                                                       (fn [a k v]
                                                         (let [[[k1 v1]] (into [] v)]
                                                           (assoc a k1 {::stylefy/mode {k v1}})))
                                                       {}
                                                       media)]
-                           (enc/assoc-some
+                           (enc/nested-merge
                             acc
-                            :style style
-                            :media media)))
+                            {:style style
+                             :media media})))
                        {}
                        pseudo-props)
          comb         (reduce-kv

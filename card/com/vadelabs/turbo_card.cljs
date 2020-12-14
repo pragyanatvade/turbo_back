@@ -4,7 +4,6 @@
    [devcards.core]
    [stylefy.core :as stylefy]))
 
-
 (defn ^:export init
   []
   (stylefy/init {:use-caching? false})

@@ -230,7 +230,7 @@
    :base {:container {:font-weight "medium"
                       :line-height "1.2"
                       :outline "0"
-                      ;; :pseudo {:focus {:box-shadow "outline"}}
+                      :pseudo {:focus {:box-shadow "outline"}}
                       }
           :label {:line-height "1.2"}
           :close-button {:font-size "18px"
@@ -240,12 +240,11 @@
                          :ml "0.375rem"
                          :mr "-1"
                          :opacity "0.5"
-                         ;; :pseudo {:disabled {:opacity 0.4}
-                         ;;          :focus {:box-shadow "outline"
-                         ;;                  :bg "rgba(0,0,0,0.14)"}
-                         ;;          :hover {:opacity "0.8"}
-                         ;;          :active {:opacity "1"}}
-                         }}
+                         :pseudo {:disabled {:opacity 0.4}
+                                  :focus {:box-shadow "outline"
+                                          :bg "rgba(0,0,0,0.14)"}
+                                  :hover {:opacity "0.8"}
+                                  :active {:opacity "1"}}}}
    :sizes {:sm {:container {:min-h "1.25rem"
                             :min-w "1.25rem"
                             :font-size "xs"
