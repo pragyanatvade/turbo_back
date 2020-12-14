@@ -214,6 +214,62 @@
              :size "md"
              :color-scheme "gray"}})
 
+
+(defn- tag-variant-subtle
+  [props]
+  {:container (variant-subtle props)})
+(defn- tag-variant-solid
+  [props]
+  {:container (variant-solid props)})
+(defn- tag-variant-outline
+  [props]
+  {:container (variant-outline props)})
+
+(def Tag
+  {:parts [:container :label :close-button]
+   :base {:container {:font-weight "medium"
+                      :line-height "1.2"
+                      :outline "0"
+                      ;; :pseudo {:focus {:box-shadow "outline"}}
+                      }
+          :label {:line-height "1.2"}
+          :close-button {:font-size "18px"
+                         :w "1.25rem"
+                         :h "1.25rem"
+                         :border-radius "full"
+                         :ml "0.375rem"
+                         :mr "-1"
+                         :opacity "0.5"
+                         ;; :pseudo {:disabled {:opacity 0.4}
+                         ;;          :focus {:box-shadow "outline"
+                         ;;                  :bg "rgba(0,0,0,0.14)"}
+                         ;;          :hover {:opacity "0.8"}
+                         ;;          :active {:opacity "1"}}
+                         }}
+   :sizes {:sm {:container {:min-h "1.25rem"
+                            :min-w "1.25rem"
+                            :font-size "xs"
+                            :px "2"
+                            :border-radius "md"}
+                :close-button {:mr "-2px"
+                               :ml "0.35rem"}}
+           :md {:container {:min-h "1.5rem"
+                            :min-w "1.5rem"
+                            :font-size "sm"
+                            :border-radius "md"
+                            :px "2"}}
+           :lg {:container {:min-h "8"
+                            :min-w "8"
+                            :font-size "md"
+                            :border-radius "md"
+                            :px "3"}}}
+   :variants {:subtle tag-variant-subtle
+              :solid tag-variant-solid
+              :outline tag-variant-outline}
+   :default {:size "md"
+             :variant "subtle"
+             :color-scheme "gray"}})
+
 (def components
   {:Badge   Badge
    :Kbd     Kbd
@@ -223,4 +279,5 @@
    :Link    Link
    :List    List
    :Table   Table
+   :Tag Tag
    })

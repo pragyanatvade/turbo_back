@@ -30,21 +30,21 @@
                 view-box  (:view-box fallback)
                 focusable false}} props
         styles                    (enc/assoc-some
-                                    {}
-                                    :w "1em"
-                                    :h "1em"
-                                    :display "inline-block"
-                                    :line-height "1em"
-                                    :flex-shrink "0"
-                                    :color color)
+                                   {}
+                                   :w "1em"
+                                   :h "1em"
+                                   :display "inline-block"
+                                   :line-height "1em"
+                                   :flex-shrink "0"
+                                   :color color
+                                   :vertical-align "middle")
         children                  (or children (:path fallback))
         props                     (enc/assoc-some
-                                    props
-                                    :turbo$css styles
-                                    :vertical-align "middle"
-                                    :view-box view-box
-                                    :focusable focusable
-                                    :as "svg")
+                                   props
+                                   :turbo$css styles
+                                   :view-box view-box
+                                   :focusable focusable
+                                   :as "svg")
         tag                       (if (fn? as)
                                     as
                                     ui/block)]

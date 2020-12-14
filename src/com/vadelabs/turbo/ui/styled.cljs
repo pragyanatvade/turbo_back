@@ -14,25 +14,27 @@
                 focusable view-box
                 height width src loading
                 cross-origin html-height html-width
-                data-is-numeric]
+                data-is-numeric type disabled]
          :or   {as "div"}} props
         attrs              (enc/assoc-some
-                             {}
-                             :className (stylify props)
-                             :href href
-                             :target target
-                             :rel rel
-                             :role role
-                             :aria-orientation aria-orientation
-                             :focusable focusable
-                             :view-box view-box
-                             :height height
-                             :width width
-                             :alt alt
-                             :src src
-                             :loading loading
-                             :cross-origin cross-origin
-                             :data-is-numeric data-is-numeric)
+                            {}
+                            :className (stylify props)
+                            :href href
+                            :target target
+                            :rel rel
+                            :role role
+                            :type type
+                            :aria-orientation aria-orientation
+                            :focusable focusable
+                            :view-box view-box
+                            :height height
+                            :width width
+                            :alt alt
+                            :src src
+                            :disabled disabled
+                            :loading loading
+                            :cross-origin cross-origin
+                            :data-is-numeric data-is-numeric)
         tag (cond
               (keyword? as) (str (name as))
               :else (str as))]

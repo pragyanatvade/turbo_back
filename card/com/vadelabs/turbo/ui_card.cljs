@@ -4,4 +4,5 @@
    [com.vadelabs.turbo.ui.layout-card]
    [com.vadelabs.turbo.ui.icons-card]
    [com.vadelabs.turbo.ui.image-card]
-   [com.vadelabs.turbo.ui.table-card]))
+   [com.vadelabs.turbo.ui.table-card]
+   [com.vadelabs.turbo.ui.tag-card]))
