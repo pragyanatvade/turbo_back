@@ -1,6 +1,7 @@
 (ns com.vadelabs.turbo.themes.components
   (:refer-clojure :exclude [List])
-  (:require [com.vadelabs.turbo.themes.helpers :as h]))
+  (:require [com.vadelabs.turbo.themes.helpers :as h]
+            [clojure.string :as str]))
 
 (defn- variant-solid
   [{:keys [color-scheme theme] :as props}]
@@ -269,6 +270,73 @@
              :variant "subtle"
              :color-scheme "gray"}})
 
+(defn- get-bg
+  [props]
+  (let [{:keys [theme color-scheme]} props
+        light-bg (h/get-color theme (str color-scheme ".100") color-scheme)
+        dark-bg ((h/transparentize (str color-scheme ".200") 0.16) theme)]
+    ((h/mode light-bg dark-bg) props)))
+
+(defn- alert-variant-subtle
+  [props]
+  (let [{:keys [color-scheme]} props]
+    {:container {:bg (get-bg props)}
+     :icon {:color ((h/mode (str color-scheme ".500")
+                            (str color-scheme ".200"))
+                    props)}}))
+
+(defn- alert-variant-left-accent
+  [props]
+  (let [{:keys [color-scheme]} props]
+    {:container {:pl "3"
+                 :border-left "4px solid"
+                 :border-color ((h/mode (str color-scheme ".500")
+                                        (str color-scheme ".200"))
+                                props)
+                 :bg (get-bg props)}
+     :icon {:color ((h/mode (str color-scheme ".500")
+                            (str color-scheme ".200"))
+                    props)}}))
+
+(defn- alert-variant-top-accent
+  [props]
+  (let [{:keys [color-scheme]} props]
+    {:container {:pt "2"
+                 :border-top "4px solid"
+                 :border-color ((h/mode (str color-scheme ".500")
+                                        (str color-scheme ".200"))
+                                props)
+                 :bg (get-bg props)}
+     :icon {:color ((h/mode (str color-scheme ".500")
+                            (str color-scheme ".200"))
+                    props)}}))
+
+(defn- alert-variant-solid
+  [props]
+  (let [{:keys [color-scheme]} props]
+    {:container {:bg ((h/mode (str color-scheme ".500")
+                              (str color-scheme ".200"))
+                      props)
+                 :color ((h/mode "white" "gray.900") props)}}))
+
+(def Alert
+  {:parts [:container :title :description :icon]
+   :base {:container {:px "4"
+                      :py "3"}
+          :title {:font-weight "bold"
+                  :line-height "6"
+                  :mr "2"}
+          :description {:line-height "6"}
+          :icon {:flex-shrink "0"
+                 :mr "3"
+                 :w "5"
+                 :h "6"}}
+   :variants {:subtle alert-variant-subtle
+              :left-accent alert-variant-left-accent
+              :top-accent alert-variant-top-accent
+              :solid alert-variant-solid}
+   :default {:variant "subtle"}})
+
 (def components
   {:Badge   Badge
    :Kbd     Kbd
@@ -278,5 +346,5 @@
    :Link    Link
    :List    List
    :Table   Table
-   :Tag Tag
-   })
+   :Tag     Tag
+   :Alert   Alert})

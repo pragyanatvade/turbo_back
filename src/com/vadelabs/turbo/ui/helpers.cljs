@@ -71,3 +71,10 @@
   (comp/provider {:context styles-context :value value} children))
 (defn use-styles []
   (:value (hooks/use-context styles-context)))
+
+(def alert-context (comp/create-context {}))
+(defn alert-provider
+  [value children]
+  (comp/provider {:context alert-context :value value} children))
+(defn use-alert-context []
+  (:value (hooks/use-context alert-context)))
