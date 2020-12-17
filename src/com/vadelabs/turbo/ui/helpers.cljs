@@ -78,3 +78,48 @@
   (comp/provider {:context alert-context :value value} children))
 (defn use-alert-context []
   (:value (hooks/use-context alert-context)))
+
+(defn use-image
+  [props]
+  (let [{:keys [src src-set on-load on-error
+                cross-origin sizes ignore-fallback?]}
+        props
+        [status set-status] (hooks/use-state "pending")
+        _ (hooks/use-effect
+           [src]
+           (set-status (if src "loading" "pending")))
+        image-ref (hooks/use-ref nil)
+        flush (fn []
+                (when @image-ref
+                  (reset! image-ref nil)))
+        load (hooks/use-callback
+              [src cross-origin src-set sizes on-load on-error]
+              (fn []
+                (let [img (js/Image.)]
+                  (set! (.-src img) src)
+                  (when cross-origin
+                    (set! (.-crossOrigin img) cross-origin))
+                  (when src-set
+                    (set! (.-srcSet img) src-set))
+                  (when sizes
+                    (set! (.-sizes img) sizes))
+                  (set! (.-onload img) (fn [event]
+                                         (flush)
+                                         (set-status "loaded")
+                                         (when on-load
+                                           (on-load event))))
+                  (set! (.-onerror img) (fn [error]
+                                          (flush)
+                                          (set-status "failed")
+                                          (when on-error
+                                            (on-error error))))
+                  (reset! image-ref img))))]
+    (hooks/use-layout-effect
+     [status load ignore-fallback?]
+     (if (= status "loading")
+       (load)
+       (fn []
+         (flush))))
+    (if ignore-fallback?
+      "loaded"
+      status)))

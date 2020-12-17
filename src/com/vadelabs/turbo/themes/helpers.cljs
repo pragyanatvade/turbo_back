@@ -102,6 +102,34 @@
       dark
       light)))
 
+(defn- random-from-list
+  [lst]
+  (let [idx (rand-int (count lst))]
+    (get lst idx)))
+
+(defn- random-color-from-list
+  [string lst]
+  (let [str-hash (hash string)
+        cnt (count lst)
+        idx (mod (+ (mod str-hash cnt) cnt) cnt)]
+    (get lst idx)))
+
+;; FIXME
+(defn- random-color-from-string
+  [string]
+  (str "#" (.toString (rand-int 16rFFFFFF) 16)))
+
+
+(defn random-color
+  [opts]
+  (let [{:keys [string colors]} opts
+        fallback (str "#" (.toString (rand-int 16rFFFFFF) 16))]
+    (cond
+      (and string colors) (random-color-from-list string colors)
+      (and string (not colors)) (random-color-from-string string)
+      (and (not string) colors) (random-from-list colors)
+      :else fallback)))
+
 (comment
 
   (light? "#ffffff")
