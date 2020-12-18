@@ -25,13 +25,17 @@
     (cond
       (map? (first args))
       `^js/React.Element (.createElement
-                           (get-react)
-                           ~type
-                           ~(if native?
-                              `(com.vadelabs.turbo.helpers/native-props ~(first args))
-                              `(com.vadelabs.turbo.helpers/props ~(first args)))
-                           ~@(rest args))
-      :else `^js/React.Element (.createElement (get-react) ~type nil ~@args))))
+                          (get-react)
+                          ~type
+                          ~(if native?
+                             `(com.vadelabs.turbo.helpers/native-props ~(first args))
+                             `(com.vadelabs.turbo.helpers/props ~(first args)))
+                          ~@(rest args))
+      :else `^js/React.Element (.createElement
+                                (get-react)
+                                ~type
+                                nil
+                                ~@args))))
 
 (defmacro <>
   "Creates a new React Fragment Element"
@@ -49,6 +53,40 @@
                         ~@(when (contains? props :value)
                             `({:value ~value}))
                         ~@children))
+
+(defmacro clone
+  [type & args]
+  (when (and (symbol? (first args))
+             (= (tana/inferred-type &env (first args))
+                'cljs.core/IMap))
+    (tana/warn tana/warning-inferred-map-props
+               &env
+               {:form       (cons type args)
+                :props-form (first args)}))
+  (let [inferred (tana/inferred-type &env type)
+        native?  (or (keyword? type)
+                     (string? type)
+                     (= inferred 'string)
+                     (= inferred 'cljs.core/Keyword)
+                     (:native (meta type)))
+        type     (if (keyword? type)
+                   (name type)
+                   type)]
+    (cond
+      (map? (first args))
+      `^js/React.Element (.cloneElement
+                          (get-react)
+                          ~type
+                          ~(if native?
+                             `(com.vadelabs.turbo.helpers/native-props ~(first args))
+                             `(com.vadelabs.turbo.helpers/props ~(first args)))
+                          ~@(rest args))
+      :else `^js/React.Element (.cloneElement
+                                (get-react)
+                                ~type
+                                nil
+                                ~@args))))
+
 
 (defn defui*
   [display-name props-bindings body]

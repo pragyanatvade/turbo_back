@@ -31,8 +31,8 @@
 (defui WithCustomIconUI
   []
   (ui/group
-   (ui/avatar {:icon generic-avatar})
-   (ui/avatar)))
+   {:children [{:icon generic-avatar}
+               {}]}))
 (defcard WithCustomIcon WithCustomIconUI)
 
 (defui WithSizesUI
@@ -44,8 +44,25 @@
            {:key size
             :size size
             :name "Jane Doe"
-            :src "https://cdn0.iconfinder.com/data/icons/avatar-78/128/7-512.pn"}
-           (ui/badge {:box-size "1.25em" :bg "green.500"})
-           ))
+            :src "https://cdn0.iconfinder.com/data/icons/avatar-78/128/7-512.png"}
+           (ui/badge {:box-size "1.25em" :bg "green.500"})))
         ["xs" "sm" "md" "lg" "xl" "2xl"])))
 (defcard WithSizes WithSizesUI)
+
+(defui AvatarGroupUI
+  []
+  (<>
+   (ui/group
+    {:size "lg" :max 3
+     :children [{:child ui/avatar :props {:name "Pragyan Tripathi" :src "https://avatars3.githubusercontent.com/u/9974960?s=400&u=8f0e379ea57c0b53f9e95706dffb999c0b5d712d&v=4"}}
+                {:child ui/avatar :props {:name "Pragyan Tripathi" :src "https://avatars3.githubusercontent.com/u/9974960?s=400&u=8f0e379ea57c0b53f9e95706dffb999c0b5d712d&v=4"}}
+                {:child ui/avatar :props {:name "Pragyan Tripathi" :src "https://avatars3.githubusercontent.com/u/9974960?s=400&u=8f0e379ea57c0b53f9e95706dffb999c0b5d712d&v=4"}}
+                {:child ui/avatar :props {:name "Pragyan Tripathi" :src "https://avatars3.githubusercontent.com/u/9974960?s=400&u=8f0e379ea57c0b53f9e95706dffb999c0b5d712d&v=4"}}]})
+   (ui/group
+    {:size "lg" :max 3
+     :children [{:name "Pragyan Tripathi" :src "https://avatars3.githubusercontent.com/u/9974960?s=400&u=8f0e379ea57c0b53f9e95706dffb999c0b5d712d&v=4"}
+                {:name "Pragyan Tripathi" :src "https://avatars3.githubusercontent.com/u/9974960?s=400&u=8f0e379ea57c0b53f9e95706dffb999c0b5d712d&v=4"}
+                {:name "Pragyan Tripathi" :src "https://avatars3.githubusercontent.com/u/9974960?s=400&u=8f0e379ea57c0b53f9e95706dffb999c0b5d712d&v=4"}
+                {:name "Pragyan Tripathi" :src "https://avatars3.githubusercontent.com/u/9974960?s=400&u=8f0e379ea57c0b53f9e95706dffb999c0b5d712d&v=4"}]})))
+
+(defcard AvatarGroup AvatarGroupUI)

@@ -14,6 +14,7 @@
                 focusable view-box
                 height width src loading
                 cross-origin html-height html-width
+                aria-label
                 data-is-numeric type disabled]
          :or   {as "div"}} props
         attrs              (enc/assoc-some
@@ -34,6 +35,7 @@
                             :disabled disabled
                             :loading loading
                             :cross-origin cross-origin
+                            :aria-label aria-label
                             :data-is-numeric data-is-numeric)
         tag (cond
               (keyword? as) (str (name as))

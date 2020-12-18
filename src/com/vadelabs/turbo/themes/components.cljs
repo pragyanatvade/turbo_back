@@ -344,8 +344,9 @@
   [props]
   {:transform "translate(25%, 25%)"
    :border-radius "full"
-   :border "0.2em solid"
-   :border-color ((h/mode "white" "gray.800") props)})
+   :border (str "0.2em solid " ((h/mode "white" "gray.800") props))
+   ;; :border-color ((h/mode "white" "gray.800") props)
+   })
 
 (defn- avatar-base-style-excess-label
   [props]
@@ -363,8 +364,8 @@
         border-color ((h/mode "white" "gray.800") props)]
     {:bg bg
      :color color
-     :border-color border-color
-     :vertical-align "top"}))
+     :vertical-align "top"
+     :border-color border-color}))
 
 (defn- avatar-base-style
   [props]

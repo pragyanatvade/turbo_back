@@ -4,7 +4,6 @@
    [com.vadelabs.turbo.components :as comp :refer [defui]]
    [com.vadelabs.turbo.ui.styled :refer [block]]
    [com.vadelabs.turbo.ui.helpers :as tuh]
-   [com.vadelabs.turbo.ui.icons :as icons]
    [com.vadelabs.turbo.dom :as d]
    [clojure.string :as str]))
 
@@ -22,9 +21,7 @@
         props (enc/assoc-some
                props
                :turbo$css badge-styles)]
-    (println "PROPS" props)
-    (block props)
-    ))
+    (block props)))
 (def badge (comp/factory AvatarBadge))
 
 (defn- initials
@@ -83,12 +80,21 @@
                :turbo$css image-props
                :loading loading
                :as "img")]
-    (if show-fallback?
-      (if name
-        (label {:get-initials get-initials :name name})
-        (icon {:role "img"}))
-      (block props))))
+    (cond
+      (and show-fallback? name) (label {:get-initials get-initials :name name})
+      (and show-fallback? (not name)) (icon {:role "img"})
+      :else (block props))))
 (def image (comp/factory AvatarImage))
+
+(def base-style
+  {:display "inline-flex"
+   :align-items "center"
+   :justify-content "center"
+   :text-align "center"
+   :text-transform "uppercase"
+   :font-weight "medium"
+   :position "relative"
+   :flex-shrink "0"})
 
 (defui Avatar
   [props]
@@ -101,20 +107,15 @@
         styles (tuh/use-multi-style-config :Avatar props)
         border-width (when show-border? "2px")
         avatar-styles (enc/assoc-some
-                       (:container styles)
+                       (enc/merge
+                        (:container styles)
+                        base-style)
                        :border-radius border-radius
                        :border-width border-width
-                       :border-color border-color
-                       :display "inline-flex"
-                       :align-items "center"
-                       :justify-content "center"
-                       :text-align "center"
-                       :text-transform "uppercase"
-                       :font-weight "medium"
-                       :position "relative"
-                       :flex-shrink "0")
+                       :border-color border-color)
         image-props (enc/assoc-some
                      {}
+                     :key "image"
                      :src src
                      :loading loading
                      :on-error on-error
@@ -123,15 +124,15 @@
                      :border-radius border-radius
                      :icon icon)
         props (enc/assoc-some
-               {}
+               props
                :turbo$css avatar-styles
-               :as "span")]
+               :as "span")
+        children (comp/vec children)
+        children (into [(image image-props)] children)]
     (block props
            (tuh/styles-provider
             {:value styles}
-            (image
-             image-props
-             children)))))
+            children))))
 (def avatar (comp/factory Avatar))
 
 (defui AvatarGroup
@@ -146,5 +147,42 @@
         excess (if max
                  (- (count children) max)
                  0)
-        reversed-children (reverse children-within-max)]))
+        reversed-children (reverse children-within-max)
+        excess-props (enc/assoc-some
+                      (enc/merge
+                       (:excess-label styles)
+                       base-style)
+                      :key "excess"
+                      :ml spacing
+                      :border-radius border-radius
+                      :as "span")
+        group-styles {:display "flex"
+                      :align-items "center"
+                      :justify-content "flex-end"
+                      :flex-direction "row-reverse"}
+        props (enc/assoc-some
+               props
+               :turbo$css group-styles
+               :role "group")
+        clones (into [] (map-indexed
+                         (fn [idx item]
+                           (let [[child child-props] (cond
+                                                       (fn? item) [item {}]
+                                                       (and (map? item) (:child item))
+                                                       [(:child item) (:props item)]
+                                                       :else [avatar item])
+                                 first-child? (= idx 0)
+                                 child-props (enc/assoc-some
+                                              child-props
+                                              :key idx
+                                              :margin-right (if first-child? "0" spacing)
+                                              :size (get props :size)
+                                              :border-color (get child-props :border-color border-color)
+                                              :show-border? true)]
+                             (child child-props)))
+                         reversed-children))
+        children (if (> excess 0)
+                   (into [(block excess-props (str "+" excess))] clones)
+                   clones)]
+    (block props children)))
 (def group (comp/factory AvatarGroup))
