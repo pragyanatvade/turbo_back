@@ -1,7 +1,9 @@
 (ns com.vadelabs.turbo.themes.components
   (:refer-clojure :exclude [List])
-  (:require [com.vadelabs.turbo.themes.helpers :as h]
-            [clojure.string :as str]))
+  (:require
+   [com.vadelabs.turbo.themes.helpers :as h]
+   [com.vadelabs.turbo.themes.foundation :as f]
+   [clojure.string :as str]))
 
 (defn- variant-solid
   [{:keys [color-scheme theme] :as props}]
@@ -337,6 +339,65 @@
               :solid alert-variant-solid}
    :default {:variant "subtle"}})
 
+
+(defn- avatar-base-style-badge
+  [props]
+  {:transform "translate(25%, 25%)"
+   :border-radius "full"
+   :border (str "0.2em solid " ((h/mode "white" "gray.800") props))
+   ;; :border-color ((h/mode "white" "gray.800") props)
+   })
+
+(defn- avatar-base-style-excess-label
+  [props]
+  {:bg ((h/mode "gray.200" "white-alpha.400") props)})
+
+(defn- avatar-base-style-container
+  [props]
+  (let [{:keys [name theme]} props
+        ;; bg (if name (h/random-color {:string name }) "gray.400")
+        bg "gray.400"
+        bg-dark? (h/dark? theme bg)
+        color (if bg-dark?
+                "white"
+                "gray.800")
+        border-color ((h/mode "white" "gray.800") props)]
+    {:bg bg
+     :color color
+     :vertical-align "top"
+     :border-color border-color}))
+
+(defn- avatar-base-style
+  [props]
+  {:badge (avatar-base-style-badge props)
+   :excess-label (avatar-base-style-excess-label props)
+   :container (avatar-base-style-container props)})
+
+(defn- get-size
+  [size]
+  (let [theme-size (get f/sizes (keyword size))]
+    {:container {:width size
+                 :height size
+                 :font-size (str "calc(" (or theme-size size) " / 2.5)")}
+     :excess-label {:width size
+                    :height size}
+     :label {:font-size (str "calc(" (or theme-size size) " / 2.5)")
+             :line-height (when (not= size "100%")
+                            (or theme-size size))}}))
+
+(def Avatar
+  {:parts [:container :excess-label :badge :label]
+   :base avatar-base-style
+   :sizes {:2xs (get-size "4")
+           :xs (get-size "6")
+           :sm (get-size "8")
+           :md (get-size "12")
+           :lg (get-size "16")
+           :xl (get-size "24")
+           :2xl (get-size "32")
+           :full (get-size "100%")}
+   :default {:size "md"}})
+
 (def components
   {:Badge   Badge
    :Kbd     Kbd
@@ -347,4 +408,5 @@
    :List    List
    :Table   Table
    :Tag     Tag
-   :Alert   Alert})
+   :Alert   Alert
+   :Avatar  Avatar})
