@@ -7,4 +7,5 @@
    [com.vadelabs.turbo.ui.table-card]
    [com.vadelabs.turbo.ui.tag-card]
    [com.vadelabs.turbo.ui.alert-card]
-   [com.vadelabs.turbo.ui.avatar-card]))
+   [com.vadelabs.turbo.ui.avatar-card]
+   [com.vadelabs.turbo.ui.breadcrumb-card]))

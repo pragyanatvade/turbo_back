@@ -398,6 +398,16 @@
            :full (get-size "100%")}
    :default {:size "md"}})
 
+(def Breadcrumb
+  {:parts [:link :separator]
+   :base {:link {:transition "all 0.15s ease-out"
+                 :cursor "pointer"
+                 :text-decoration "none"
+                 :outline "none"
+                 :color "inherit"
+                 :pseudo {:hover {:text-decoration "underline"}
+                          :focus {:box-shadow "outline"}}}}})
+
 (def components
   {:Badge   Badge
    :Kbd     Kbd
@@ -409,4 +419,5 @@
    :Table   Table
    :Tag     Tag
    :Alert   Alert
-   :Avatar  Avatar})
+   :Avatar  Avatar
+   :Breadcrumb Breadcrumb})
