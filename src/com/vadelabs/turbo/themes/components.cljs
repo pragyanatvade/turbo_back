@@ -529,6 +529,32 @@
                 :h "3rem"}}
    :default {:size "md"}})
 
+(defn- close-button-base
+  [props]
+  (let [hover-bg ((h/mode "black-alpha.100" "white-alpha.100") props)
+        active-bg ((h/mode "black-alpha.200" "white-alpha.200") props)]
+    {:border-radius "md"
+     :transition "all 0.2s"
+     :pseudo {:disabled {:opacity "0.4"
+                         :cursor "not-allowed"
+                         :box-shadow "none"}
+              :hover {:bg hover-bg}
+              :active {:bg active-bg}
+              :focus {:box-shadow "outline"}}}))
+
+(def CloseButton
+  {:base close-button-base
+   :sizes {:lg {:w "40px"
+                :h "40px"
+                :font-size "16px"}
+           :md {:w "32px"
+                :h "32px"
+                :font-size "12px"}
+           :sm {:w "24px"
+                :h "24px"
+                :font-size "10px"}}
+   :default {:size "md"}})
+
 (def components
   {:Badge   Badge
    :Kbd     Kbd
@@ -543,4 +569,5 @@
    :Avatar  Avatar
    :Breadcrumb Breadcrumb
    :Button Button
-   :Spinner Spinner})
+   :Spinner Spinner
+   :CloseButton CloseButton})

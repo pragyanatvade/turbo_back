@@ -12,4 +12,5 @@
    [com.vadelabs.turbo.ui.button-card]
    [com.vadelabs.turbo.ui.visually-hidden-card]
    [com.vadelabs.turbo.ui.spinner-card]
+   [com.vadelabs.turbo.ui.close-button-card]
    ))
