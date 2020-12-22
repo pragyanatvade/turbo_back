@@ -408,6 +408,127 @@
                  :pseudo {:hover {:text-decoration "underline"}
                           :focus {:box-shadow "outline"}}}}})
 
+(defn- button-variant-ghost
+  [props]
+  (let [{:keys [color-scheme theme]} props
+        dark-hover-bg ((h/transparentize (str color-scheme ".200") 0.12) theme)
+        dark-active-bg ((h/transparentize (str color-scheme ".200") 0.24) theme)]
+    (if (= color-scheme "gray")
+      {:color ((h/mode "inherit" "white-alpha.900") props)
+       :pseudo {:hover {:bg ((h/mode "gray.100" "white-alpha.200") props)}
+                :active {:bg ((h/mode "gray.200" "white-alpha.300") props)}}}
+      {:color ((h/mode
+                (str color-scheme ".600")
+                (str color-scheme ".200")) props)
+       :bg "transparent"
+       :pseudo {:hover {:bg ((h/mode (str color-scheme ".50") dark-hover-bg) props)}
+                :active {:bg ((h/mode (str color-scheme ".100") dark-active-bg) props)}}})))
+(defn- button-variant-outline
+  [props]
+  (let [{:keys [color-scheme]} props
+        border-color ((h/mode "gray.200" "white-alpha.300") props)
+        ghost (button-variant-ghost props)]
+    (assoc
+     ghost
+     :border "1px solid"
+     :border-color (if (= color-scheme "gray") border-color "currentColor"))))
+(def accessible-color-map
+  {:yellow {:bg "yellow.400"
+            :color "black"
+            :hover-bg "yellow.500"
+            :active-bg "yellow.600"}
+   :cyan {:bg "cyan.400"
+          :color "black"
+          :hover-bg "cyan.500"
+          :active-bg "cyan.600"}})
+(defn- button-variant-solid
+  [props]
+  (let [{:keys [color-scheme]} props
+        bg ((h/mode "gray.100" "white-alpha.200") props)]
+    (if (= color-scheme "gray")
+      {:bg bg
+       :pseudo {:hover {:bg ((h/mode "gray.200" "white-alpha.300") props)
+                        :disabled {:bg bg}}
+                :active {:bg ((h/mode "gray.300" "white-alpha.400") props)}}}
+      (let [{:keys [bg color hover-bg active-bg]
+             :or {bg (str color-scheme ".500")
+                  color "white"
+                  hover-bg (str color-scheme ".600")
+                  active-bg (str color-scheme ".700")}}
+            (get accessible-color-map (keyword color-scheme) {})
+            background ((h/mode bg (str color-scheme ".200")) props)]
+        {:bg background
+         :color ((h/mode color "gray.800") props)
+         :pseudo {:hover {:bg ((h/mode hover-bg (str color-scheme ".300")) props)
+                          :disabled {:bg background}}
+                  :active {:bg ((h/mode active-bg (str color-scheme ".400")) props)}}}))))
+(defn- button-variant-link
+  [props]
+  (let [{:keys [color-scheme]} props]
+    {:padding "0"
+     :height "auto"
+     :line-height "normal"
+     :color ((h/mode (str color-scheme ".500") (str color-scheme ".200")) props)
+     :pseudo {:hover {:text-decoration "underline"
+                      :disabled {:text-decoration "none"}}
+              :active {:color ((h/mode (str color-scheme ".700") (str color-scheme ".500")) props)}}}))
+(defn- button-variant-unstyled
+  [_]
+  {:bg "none"
+   :color "inherit"
+   :display "inline"
+   :line-height "inherit"
+   :m "0"
+   :p "0"})
+
+
+(def Button
+  {:base {:line-height "1.2"
+          :border-radius "md"
+          :font-weight "semibold"
+          :pseudo {:focus {:box-shadow "outline"}
+                   :disabled {:opacity "0.4"
+                              :cursor "not-allowed"
+                              :box-shadow "none"}
+                   :hover {:disabled {:bg "initial"}}}}
+   :variants {:ghost button-variant-ghost
+              :outline button-variant-outline
+              :solid button-variant-solid
+              :link button-variant-link
+              :unstyled button-variant-unstyled}
+   :sizes {:lg {:h "12"
+                :min-w "12"
+                :font-size "lg"
+                :px "6"}
+           :md {:h "10"
+                :min-w "10"
+                :font-size "md"
+                :px "4"}
+           :sm {:h "8"
+                :min-w "8"
+                :font-size "sm"
+                :px "3"}
+           :xs {:h "6"
+                :min-w "6"
+                :font-size "xs"
+                :px "2"}}
+   :default {:variant "solid"
+             :size "md"
+             :color-scheme "gray"}})
+
+(def Spinner
+  {:sizes {:xs {:w "0.75rem"
+                :h "0.75rem"}
+           :sm {:w "1rem"
+                :h "1rem"}
+           :md {:w "1.5rem"
+                :h "1.5rem"}
+           :lg {:w "2rem"
+                :h "2rem"}
+           :xl {:w "3rem"
+                :h "3rem"}}
+   :default {:size "md"}})
+
 (def components
   {:Badge   Badge
    :Kbd     Kbd
@@ -420,4 +541,6 @@
    :Tag     Tag
    :Alert   Alert
    :Avatar  Avatar
-   :Breadcrumb Breadcrumb})
+   :Breadcrumb Breadcrumb
+   :Button Button
+   :Spinner Spinner})

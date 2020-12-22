@@ -248,7 +248,8 @@
    :content         true
    :border-collapse true
    :font-variant-numeric true
-   :caption-side true})
+   :caption-side true
+   :clip true})
 (def ^:private others-aliases
   others-config)
 (def others (system others-aliases))
